@@ -83,6 +83,7 @@ export interface Character {
   description: string
   avatarColor: string
   imageUrl?: string | null
+  faceImageUrl?: string | null
   age?: string
   gender?: string
 }

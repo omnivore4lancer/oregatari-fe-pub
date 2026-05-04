@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 import type { EpisodePageData, EpisodePanelData, EpisodePageRowData } from '../../types/episodePage'
 
 interface PagePreviewProps {
@@ -130,7 +132,7 @@ function RowBlock({ row, heightPct, selectedPanelId, onSelectPanel, mini, struct
   )
 }
 
-export function PagePreview({
+export const PagePreview = memo(function PagePreview({
   page,
   selectedPanelId,
   onSelectPanel,
@@ -157,4 +159,4 @@ export function PagePreview({
       })}
     </div>
   )
-}
+})

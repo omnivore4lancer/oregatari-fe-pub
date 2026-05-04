@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { ArrowLeftIcon, RefreshIcon } from '../../components/Icons'
@@ -12,9 +12,58 @@ import {
   SceneRightPanel,
   useSceneJobs,
 } from '../../features/episode'
-import type { EpisodePageData, EpisodePanelData, EpisodeResponse } from '../../features/episode'
+import type { EpisodePageData, EpisodePanelData } from '../../features/episode'
+import { queryKeys } from '../../lib/queryKeys'
+import { useQueryWithError } from '../../lib/useQueryWithError'
 
 type SidebarTab = 'settings' | 'detail'
+
+interface PageThumbnailButtonProps {
+  page: EpisodePageData
+  isSelected: boolean
+  isGenerating: boolean
+  isLayoutRegenerating: boolean
+  onSelect: (page: EpisodePageData) => void
+}
+
+const PageThumbnailButton = memo(function PageThumbnailButton({
+  page,
+  isSelected,
+  isGenerating,
+  isLayoutRegenerating,
+  onSelect,
+}: PageThumbnailButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={() => { if (isLayoutRegenerating) return; onSelect(page) }}
+      className="shrink-0 flex flex-col items-center gap-1 cursor-pointer border-0 bg-transparent p-0"
+    >
+      <div
+        className={`w-14 rounded overflow-hidden border-2 transition-all relative ${
+          isSelected
+            ? 'border-[var(--accent)]'
+            : 'border-transparent hover:border-[var(--accent-border)]'
+        }`}
+        style={{ height: '64px' }}
+      >
+        {page.imageUrl ? (
+          <img src={page.imageUrl} alt={`ページ${page.pageNumber}`} className="w-full h-full object-cover" loading="lazy" />
+        ) : (
+          <PagePreview page={page} mini />
+        )}
+        {isGenerating && (
+          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+            <SpinnerDots size="sm" />
+          </div>
+        )}
+      </div>
+      <span className={`text-[10px] transition-colors ${isSelected ? 'text-white font-semibold' : 'text-white/70'}`}>
+        {page.pageNumber}
+      </span>
+    </button>
+  )
+})
 
 export default function SceneManagementPage() {
   const navigate = useNavigate()
@@ -23,8 +72,17 @@ export default function SceneManagementPage() {
   const epId = Number(episodeId)
   const { showError } = useApiError()
 
-  const [episodeTitle, setEpisodeTitle] = useState<string>('')
-  const [episodes, setEpisodes] = useState<EpisodeResponse[]>([])
+  const episodeQuery = useQueryWithError({
+    queryKey: queryKeys.episode(storyId, epId),
+    queryFn: () => episodeApi.getEpisode(storyId, epId),
+  })
+  const episodesQuery = useQueryWithError({
+    queryKey: queryKeys.episodes(storyId),
+    queryFn: () => episodeApi.getEpisodes(storyId),
+  })
+  const episodeTitle = episodeQuery.data?.title ?? ''
+  const episodes = episodesQuery.data ?? []
+
   const [pages, setPages] = useState<EpisodePageData[]>([])
   const [selectedPage, setSelectedPage] = useState<EpisodePageData | null>(null)
   const [selectedPanel, setSelectedPanel] = useState<EpisodePanelData | null>(null)
@@ -45,6 +103,11 @@ export default function SceneManagementPage() {
     if (updated.length > 0) setSelectedPage(updated[0])
   }, [])
 
+  const handleSelectPage = useCallback((page: EpisodePageData) => {
+    setSelectedPage(page)
+    setSelectedPanel(null)
+  }, [])
+
   const {
     generatingPages,
     regeneratingLayout,
@@ -62,14 +125,10 @@ export default function SceneManagementPage() {
     async function load() {
       setLoading(true)
       try {
-        const [ep, epList, pageList, activeJobs] = await Promise.all([
-          episodeApi.getEpisode(storyId, epId),
-          episodeApi.getEpisodes(storyId),
+        const [pageList, activeJobs] = await Promise.all([
           episodePageApi.getPages(storyId, epId),
           episodePageApi.getActiveJobs(storyId, epId),
         ])
-        setEpisodeTitle(ep.title)
-        setEpisodes(epList)
         setPages(pageList)
         if (pageList.length > 0) setSelectedPage(pageList[0])
         initFromActiveJobs(activeJobs)
@@ -98,8 +157,7 @@ export default function SceneManagementPage() {
         }
       }
       const pageList = await episodePageApi.getPages(storyId, epId)
-      setPages(pageList)
-      if (pageList.length > 0) setSelectedPage(pageList[0])
+      handleLayoutCompleted(pageList)
     } catch (e) {
       showError(e)
     } finally {
@@ -216,39 +274,14 @@ export default function SceneManagementPage() {
               {/* Page thumbnail list */}
               <div className="w-20 shrink-0 flex flex-col overflow-y-auto bg-black/50 gap-2 py-3 px-2">
                 {pages.map((page) => (
-                  <button
+                  <PageThumbnailButton
                     key={page.id}
-                    type="button"
-                    onClick={() => {
-                      if (regeneratingLayout) return
-                      setSelectedPage(page)
-                      setSelectedPanel(null)
-                    }}
-                    className="shrink-0 flex flex-col items-center gap-1 cursor-pointer border-0 bg-transparent p-0"
-                  >
-                    <div
-                      className={`w-14 rounded overflow-hidden border-2 transition-all relative ${
-                        selectedPage?.id === page.id
-                          ? 'border-[var(--accent)]'
-                          : 'border-transparent hover:border-[var(--accent-border)]'
-                      }`}
-                      style={{ height: '64px' }}
-                    >
-                      {page.imageUrl ? (
-                        <img src={page.imageUrl} alt={`ページ${page.pageNumber}`} className="w-full h-full object-cover" />
-                      ) : (
-                        <PagePreview page={page} mini />
-                      )}
-                      {generatingPages.has(page.pageNumber) && (
-                        <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-                          <SpinnerDots size="sm" />
-                        </div>
-                      )}
-                    </div>
-                    <span className={`text-[10px] transition-colors ${selectedPage?.id === page.id ? 'text-white font-semibold' : 'text-white/70'}`}>
-                      {page.pageNumber}
-                    </span>
-                  </button>
+                    page={page}
+                    isSelected={selectedPage?.id === page.id}
+                    isGenerating={generatingPages.has(page.pageNumber)}
+                    isLayoutRegenerating={regeneratingLayout}
+                    onSelect={handleSelectPage}
+                  />
                 ))}
               </div>
 

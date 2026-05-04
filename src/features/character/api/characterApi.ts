@@ -18,6 +18,7 @@ export interface CharacterResponse {
   skills: string[]
   avatarColor: string | null
   imageUrl: string | null
+  faceImageUrl: string | null
   createdAt: string
   updatedAt: string
 }
@@ -47,6 +48,7 @@ export function toCharacter(r: CharacterResponse): Character {
     description: r.overview ?? '',
     avatarColor: r.avatarColor ?? colorForId(r.id),
     imageUrl: r.imageUrl ?? null,
+    faceImageUrl: r.faceImageUrl ?? null,
     age: r.age ?? undefined,
     gender: r.gender ?? undefined,
   }

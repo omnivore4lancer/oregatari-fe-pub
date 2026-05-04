@@ -12,7 +12,7 @@ export function SubCharacterCard({ character, onClick }: SubCharacterCardProps) 
       onClick={onClick}
       className="bg-[var(--bg)] border border-[var(--border)] rounded-lg p-3.5 flex gap-3 cursor-pointer hover:border-[var(--accent-border)] transition-colors"
     >
-      <CharacterAvatar initials={character.initials} color={character.avatarColor} imageUrl={character.imageUrl} size="md" />
+      <CharacterAvatar initials={character.initials} color={character.avatarColor} imageUrl={character.faceImageUrl ?? character.imageUrl} size="md" />
       <div className="min-w-0">
         <p className="font-bold text-[13px] text-[var(--text-h)] leading-tight mb-0.5">
           {character.name}
