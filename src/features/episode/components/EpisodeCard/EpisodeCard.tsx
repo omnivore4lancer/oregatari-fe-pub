@@ -1,5 +1,6 @@
 import { ComicIcon, EditIcon, TrashIcon } from '../../../../components/Icons'
 import { Button, SpinnerDots, StatusBadge } from '../../../../components/ui'
+import { EPISODE_STATUS, EPISODE_STATUS_LABEL } from '../../constants'
 import type { Episode } from '../../types'
 
 interface EpisodeCardProps {
@@ -7,9 +8,11 @@ interface EpisodeCardProps {
   onEdit?: () => void
   onComicEdit?: () => void
   onDelete?: () => void
+  onPublish?: () => void
+  onUnpublish?: () => void
 }
 
-export function EpisodeCard({ episode, onEdit, onComicEdit, onDelete }: EpisodeCardProps) {
+export function EpisodeCard({ episode, onEdit, onComicEdit, onDelete, onPublish, onUnpublish }: EpisodeCardProps) {
   const isGenerating = episode.generatingState === 'generating'
 
   return (
@@ -22,13 +25,26 @@ export function EpisodeCard({ episode, onEdit, onComicEdit, onDelete }: EpisodeC
               {episode.title}
             </span>
             <StatusBadge
-              label={episode.status}
-              variant={episode.status === '公開中' ? 'success' : 'default'}
+              label={EPISODE_STATUS_LABEL[episode.status]}
+              variant={episode.status === EPISODE_STATUS.PUBLISHED ? 'success' : 'default'}
             />
           </div>
-          <Button variant="primary" className="shrink-0 !py-1 text-[12px]">
-            公開
-          </Button>
+          {episode.status === EPISODE_STATUS.PUBLISHED ? (
+            <Button
+              className="shrink-0 !py-1 text-[12px] border-red-300 text-red-600 hover:border-red-400"
+              onClick={(e) => { e.stopPropagation(); onUnpublish?.() }}
+            >
+              公開取り下げ
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              className="shrink-0 !py-1 text-[12px]"
+              onClick={(e) => { e.stopPropagation(); onPublish?.() }}
+            >
+              公開する
+            </Button>
+          )}
         </div>
 
         <p className="text-[12px] text-[var(--text)] leading-relaxed line-clamp-2 mb-3">

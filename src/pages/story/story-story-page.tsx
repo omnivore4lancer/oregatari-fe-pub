@@ -138,10 +138,11 @@ export default function StoryStoryPage() {
   return (
     <>
       <StoryEditTabs storyId={storyId} />
-      <div className="flex gap-4 p-5 items-start">
-        <div className="flex-1 flex flex-col gap-3.5 min-w-0">
+      <div className="flex gap-4 p-5 items-stretch">
+        <div className="flex-1 min-w-0">
           <SectionCard
             title="時代背景"
+            className="h-full"
             headerActions={
               <EditingActions
                 editing={editingSection === 'era'}
@@ -158,14 +159,17 @@ export default function StoryStoryPage() {
                 onChange={(e) => setEraDraft(e.target.value)}
               />
             ) : (
-              <p className="text-[13px] text-[var(--text)] leading-relaxed">
+              <p className="text-[15px] text-gray-800 leading-relaxed whitespace-pre-line">
                 {eraBg || '（未設定）'}
               </p>
             )}
           </SectionCard>
+        </div>
 
+        <div className="flex-[2] min-w-0">
           <SectionCard
             title="歴史ストーリー"
+            className="h-full"
             headerActions={
               <div className="flex items-center gap-2">
                 <Button
@@ -219,6 +223,7 @@ export default function StoryStoryPage() {
             </>
           </SectionCard>
         </div>
+
       </div>
 
       {generating && (

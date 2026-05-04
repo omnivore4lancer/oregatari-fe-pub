@@ -11,6 +11,8 @@ import {
   CharacterSelectSection,
   type Episode,
   EpisodeDetailSection,
+  EPISODE_TYPE,
+  EPISODE_TYPE_LABEL,
   type EpisodeType,
   EpisodeTypeCard,
   InheritRelationToggle,
@@ -59,10 +61,10 @@ export default function EpisodeCreatePage() {
 
   function buildGenerateInput() {
     return {
-      relation: (selectedType === '続編' ? 'SEQUEL' : 'STANDALONE') as 'SEQUEL' | 'STANDALONE',
-      parentId: selectedType === '続編' && parentEpisodeId ? parentEpisodeId : undefined,
+      relation: (selectedType === EPISODE_TYPE.SEQUEL ? 'SEQUEL' : 'STANDALONE') as 'SEQUEL' | 'STANDALONE',
+      parentId: selectedType === EPISODE_TYPE.SEQUEL && parentEpisodeId ? parentEpisodeId : undefined,
       characterIds,
-      inheritRelation: selectedType === '独立' ? inheritRelation : undefined,
+      inheritRelation: selectedType === EPISODE_TYPE.STANDALONE ? inheritRelation : undefined,
       titleHint: title.trim() || undefined,
       summaryHint: summary.trim() || undefined,
     }
@@ -101,7 +103,7 @@ export default function EpisodeCreatePage() {
     }
   }
 
-  const showForm = selectedType === '独立' || selectedType === '続編'
+  const showForm = selectedType === EPISODE_TYPE.STANDALONE || selectedType === EPISODE_TYPE.SEQUEL
 
   return (
     <div className="flex h-full">
@@ -190,10 +192,10 @@ export default function EpisodeCreatePage() {
                         </svg>
                       </div>
                     }
-                    title="独立"
+                    title={EPISODE_TYPE_LABEL[EPISODE_TYPE.STANDALONE]}
                     description="新しい物語の起点。連続エピソードの第1話としても使用可能"
-                    selected={selectedType === '独立'}
-                    onSelect={() => setSelectedType('独立')}
+                    selected={selectedType === EPISODE_TYPE.STANDALONE}
+                    onSelect={() => setSelectedType(EPISODE_TYPE.STANDALONE)}
                   />
                   <EpisodeTypeCard
                     icon={
@@ -203,19 +205,19 @@ export default function EpisodeCreatePage() {
                         </svg>
                       </div>
                     }
-                    title="続編"
+                    title={EPISODE_TYPE_LABEL[EPISODE_TYPE.SEQUEL]}
                     description="既存の直接的な続き。時系列に連続する展開"
-                    selected={selectedType === '続編'}
-                    onSelect={() => setSelectedType('続編')}
+                    selected={selectedType === EPISODE_TYPE.SEQUEL}
+                    onSelect={() => setSelectedType(EPISODE_TYPE.SEQUEL)}
                   />
                 </div>
               </div>
 
-              {selectedType === '独立' && (
+              {selectedType === EPISODE_TYPE.STANDALONE && (
                 <InheritRelationToggle checked={inheritRelation} onChange={setInheritRelation} />
               )}
 
-              {selectedType === '続編' && (
+              {selectedType === EPISODE_TYPE.SEQUEL && (
                 <SequelParentSection
                   episodes={episodes}
                   selectedId={parentEpisodeId}

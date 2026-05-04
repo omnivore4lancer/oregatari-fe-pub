@@ -1,7 +1,7 @@
-export type EpisodeType = '独立' | '続編' | null
+export type EpisodeType = 'standalone' | 'sequel' | null
 
-export type EpisodeStatus = '未公開' | '公開中'
-export type EpisodeRelation = '続編' | '並列' | '単独'
+export type EpisodeStatus = 'unpublished' | 'published'
+export type EpisodeRelation = 'sequel' | 'parallel' | 'standalone'
 export type GeneratingState = 'generating' | 'done'
 
 export interface Episode {
@@ -19,7 +19,7 @@ export interface Episode {
   hasScenes: boolean
 }
 
-export type FilterTab = 'all' | '続編' | '単独' | '未公開' | '公開中'
+export type FilterTab = 'all' | 'sequel' | 'standalone' | 'unpublished' | 'published'
 
 export interface FilterTabItem {
   key: FilterTab

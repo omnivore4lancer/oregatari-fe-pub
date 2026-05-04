@@ -26,6 +26,7 @@ export default function EpisodeListPage() {
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all')
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null)
   const [deletingEpisode, setDeletingEpisode] = useState<Episode | null>(null)
+  const [publishTarget, setPublishTarget] = useState<{ episode: Episode; action: 'publish' | 'unpublish' } | null>(null)
   const [polling, setPolling] = useState(() => !!(location.state as { backgroundGenerating?: boolean } | null)?.backgroundGenerating)
   const [loading, setLoading] = useState(true)
   const prevCountRef = useRef<number | null>(null)
@@ -45,6 +46,24 @@ export default function EpisodeListPage() {
       showError(e)
     } finally {
       setDeletingEpisode(null)
+    }
+  }
+
+  async function handlePublishConfirm() {
+    if (!publishTarget) return
+    const { episode, action } = publishTarget
+    try {
+      const updated = action === 'publish'
+        ? await episodeApi.publishEpisode(storyId, episode.id)
+        : await episodeApi.unpublishEpisode(storyId, episode.id)
+      const updatedEpisode = toEpisode(updated)
+      setEpisodes((prev) => prev.map((e) => e.id === episode.id ? updatedEpisode : e))
+      if (selectedEpisode?.id === episode.id) setSelectedEpisode(updatedEpisode)
+      showToast(action === 'publish' ? '公開しました' : '公開を取り下げました')
+    } catch (e) {
+      showError(e)
+    } finally {
+      setPublishTarget(null)
     }
   }
 
@@ -144,6 +163,8 @@ export default function EpisodeListPage() {
                     onEdit={() => navigate(`/stories/${id}/episodes/${ep.id}/edit`)}
                     onComicEdit={() => handleComicEdit(ep)}
                     onDelete={() => setDeletingEpisode(ep)}
+                    onPublish={() => setPublishTarget({ episode: ep, action: 'publish' })}
+                    onUnpublish={() => setPublishTarget({ episode: ep, action: 'unpublish' })}
                   />
                 </button>
               ))
@@ -169,6 +190,25 @@ export default function EpisodeListPage() {
         onCancel={() => setDeletingEpisode(null)}
       />
 
+      <ConfirmDialog
+        open={publishTarget?.action === 'publish'}
+        title="エピソードを公開しますか？"
+        message={`「${publishTarget?.episode.title}」を公開します。`}
+        confirmLabel="公開する"
+        confirmVariant="primary"
+        onConfirm={handlePublishConfirm}
+        onCancel={() => setPublishTarget(null)}
+      />
+
+      <ConfirmDialog
+        open={publishTarget?.action === 'unpublish'}
+        title="公開を取り下げますか？"
+        message={`「${publishTarget?.episode.title}」の公開を取り下げます。`}
+        confirmLabel="取り下げる"
+        confirmVariant="danger"
+        onConfirm={handlePublishConfirm}
+        onCancel={() => setPublishTarget(null)}
+      />
     </div>
   )
 }

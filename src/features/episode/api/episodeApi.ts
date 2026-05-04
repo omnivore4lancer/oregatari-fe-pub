@@ -20,13 +20,13 @@ export interface EpisodeResponse {
 }
 
 const STATUS_MAP: Record<EpisodeResponse['status'], EpisodeStatus> = {
-  UNPUBLISHED: '未公開',
-  PUBLISHED: '公開中',
+  UNPUBLISHED: 'unpublished',
+  PUBLISHED: 'published',
 }
 const RELATION_MAP: Record<EpisodeResponse['relation'], EpisodeRelation> = {
-  SEQUEL: '続編',
-  PARALLEL: '並列',
-  STANDALONE: '単独',
+  SEQUEL: 'sequel',
+  PARALLEL: 'parallel',
+  STANDALONE: 'standalone',
 }
 const GENERATING_MAP: Record<EpisodeResponse['generatingState'], GeneratingState> = {
   GENERATING: 'generating',
@@ -34,13 +34,13 @@ const GENERATING_MAP: Record<EpisodeResponse['generatingState'], GeneratingState
 }
 
 export const STATUS_TO_BE: Record<EpisodeStatus, EpisodeResponse['status']> = {
-  未公開: 'UNPUBLISHED',
-  公開中: 'PUBLISHED',
+  unpublished: 'UNPUBLISHED',
+  published: 'PUBLISHED',
 }
 export const RELATION_TO_BE: Record<EpisodeRelation, EpisodeResponse['relation']> = {
-  続編: 'SEQUEL',
-  並列: 'PARALLEL',
-  単独: 'STANDALONE',
+  sequel: 'SEQUEL',
+  parallel: 'PARALLEL',
+  standalone: 'STANDALONE',
 }
 
 export function toEpisode(r: EpisodeResponse): Episode {
@@ -97,6 +97,10 @@ export const episodeApi = {
     apiClient.put<EpisodeResponse>(`/stories/${storyId}/episodes/${episodeId}`, data),
   deleteEpisode: (storyId: number, episodeId: number) =>
     apiClient.delete<{ message: string }>(`/stories/${storyId}/episodes/${episodeId}`),
+  publishEpisode: (storyId: number, episodeId: number) =>
+    apiClient.post<EpisodeResponse>(`/stories/${storyId}/episodes/${episodeId}/publish`, {}),
+  unpublishEpisode: (storyId: number, episodeId: number) =>
+    apiClient.post<EpisodeResponse>(`/stories/${storyId}/episodes/${episodeId}/unpublish`, {}),
   generateStream: (storyId: number, data: GenerateEpisodeInput) =>
     apiClient.stream(`/stories/${storyId}/episodes/generate/stream`, {
       method: 'POST',

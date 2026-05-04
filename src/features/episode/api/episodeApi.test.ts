@@ -22,26 +22,26 @@ const base: EpisodeResponse = {
 }
 
 describe('toEpisode - status マッピング', () => {
-  it('UNPUBLISHED → 未公開', () => {
-    expect(toEpisode(base).status).toBe('未公開')
+  it('UNPUBLISHED → unpublished', () => {
+    expect(toEpisode(base).status).toBe('unpublished')
   })
 
-  it('PUBLISHED → 公開中', () => {
-    expect(toEpisode({ ...base, status: 'PUBLISHED' }).status).toBe('公開中')
+  it('PUBLISHED → published', () => {
+    expect(toEpisode({ ...base, status: 'PUBLISHED' }).status).toBe('published')
   })
 })
 
 describe('toEpisode - relation マッピング', () => {
-  it('STANDALONE → 単独', () => {
-    expect(toEpisode(base).relation).toBe('単独')
+  it('STANDALONE → standalone', () => {
+    expect(toEpisode(base).relation).toBe('standalone')
   })
 
-  it('SEQUEL → 続編', () => {
-    expect(toEpisode({ ...base, relation: 'SEQUEL' }).relation).toBe('続編')
+  it('SEQUEL → sequel', () => {
+    expect(toEpisode({ ...base, relation: 'SEQUEL' }).relation).toBe('sequel')
   })
 
-  it('PARALLEL → 並列', () => {
-    expect(toEpisode({ ...base, relation: 'PARALLEL' }).relation).toBe('並列')
+  it('PARALLEL → parallel', () => {
+    expect(toEpisode({ ...base, relation: 'PARALLEL' }).relation).toBe('parallel')
   })
 })
 
