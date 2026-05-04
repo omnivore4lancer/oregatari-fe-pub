@@ -2,6 +2,10 @@
 
 マンガ制作支援アプリ「俺語り」のフロントエンド。React + Vite + TypeScript で構築。
 
+## 参考ページ
+
+- [公開作品サンプル](https://oregatari-fe.vercel.app/works/1)
+
 ## 技術スタック
 
 | 用途 | ライブラリ |
@@ -61,10 +65,6 @@ src/
 ├── contexts/            # React Context（ApiError, Toast, Auth）
 └── lib/                 # apiClient など低レベルユーティリティ
 ```
-
-## 参考ページ
-
-- [公開作品サンプル](https://oregatari-fe.vercel.app/works/1)
 
 ## 主要ページ
 
