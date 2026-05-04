@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { PlusIcon } from '../../components/Icons'
@@ -8,6 +9,8 @@ import { useToast } from '../../contexts/ToastContext'
 import type { StoryItem } from '../../features/dashboard'
 import { StoryCard } from '../../features/dashboard'
 import { storyApi } from '../../features/story'
+import { queryKeys } from '../../lib/queryKeys'
+import { useQueryWithError } from '../../lib/useQueryWithError'
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -22,34 +25,29 @@ function relativeTime(iso: string): string {
 export default function DashboardPage() {
   const { showError } = useApiError()
   const { showToast } = useToast()
-  const [stories, setStories] = useState<StoryItem[]>([])
+  const queryClient = useQueryClient()
   const [deleteTarget, setDeleteTarget] = useState<StoryItem | null>(null)
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    storyApi
-      .getStories()
-      .then((data) => {
-        setStories(
-          data.map((s) => ({
-            id: s.id,
-            title: s.name,
-            badge: s.genres[0]?.name ?? '',
-            age: relativeTime(s.createdAt),
-            coverImageUrl: s.coverImageUrl ?? null,
-            previewImages: s.previewImages ?? [],
-          })),
-        )
-      })
-      .catch(showError)
-      .finally(() => setLoading(false))
-  }, [showError])
+  const { data: stories = [], isLoading } = useQueryWithError({
+    queryKey: queryKeys.stories(),
+    queryFn: () =>
+      storyApi.getStories().then((data) =>
+        data.map((s) => ({
+          id: s.id,
+          title: s.name,
+          badge: s.genres[0]?.name ?? '',
+          age: relativeTime(s.createdAt),
+          coverImageUrl: s.coverImageUrl ?? null,
+          previewImages: s.previewImages ?? [],
+        })),
+      ),
+  })
 
   async function handleDeleteConfirm() {
     if (!deleteTarget) return
     try {
       await storyApi.deleteStory(deleteTarget.id)
-      setStories((prev) => prev.filter((s) => s.id !== deleteTarget.id))
+      queryClient.invalidateQueries({ queryKey: queryKeys.stories() })
       showToast('物語を削除しました')
     } catch (e) {
       showError(e)
@@ -60,7 +58,6 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Sub-tabs + action */}
       <div className="flex items-center justify-between px-5 py-2.5 border-b border-gray-200">
         <button className="px-3.5 py-1.5 rounded-md text-[13px] bg-gray-100 text-gray-800 font-semibold border-none cursor-default">
           漫画
@@ -74,9 +71,8 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Content */}
       <div className="flex-1 overflow-y-auto px-5 py-5">
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center pt-20">
             <SpinnerDots size="md" />
           </div>

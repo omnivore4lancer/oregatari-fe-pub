@@ -19,10 +19,6 @@ interface Props {
   isGeneratingCover: boolean
   onGenerateCoverImage: () => void
   onSave: () => void
-  publishedAt: string | null
-  isPublishing: boolean
-  onPublish: () => void
-  onUnpublish: () => void
 }
 
 const TABS = [
@@ -48,10 +44,6 @@ export function PublishCoverSettings({
   isGeneratingCover,
   onGenerateCoverImage,
   onSave,
-  publishedAt,
-  isPublishing,
-  onPublish,
-  onUnpublish,
 }: Props) {
   return (
     <SectionCard
@@ -67,27 +59,12 @@ export function PublishCoverSettings({
           >
             {isGeneratingCover ? '生成中...' : '🎨 生成'}
           </Button>
-          <Button onClick={onSave} className="text-[12px]">
+          <Button
+            onClick={onSave}
+            className="text-[12px] border-emerald-500 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-600"
+          >
             保存
           </Button>
-          {publishedAt ? (
-            <Button
-              className="text-[12px] border-red-300 text-red-600 hover:border-red-400"
-              onClick={onUnpublish}
-              disabled={isPublishing}
-            >
-              {isPublishing ? '処理中...' : '公開取り下げ'}
-            </Button>
-          ) : (
-            <Button
-              variant="primary"
-              className="text-[12px]"
-              onClick={onPublish}
-              disabled={isPublishing}
-            >
-              {isPublishing ? '処理中...' : '公開する'}
-            </Button>
-          )}
         </>
       }
     >

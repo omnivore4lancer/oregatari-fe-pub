@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { ChevronDownIcon, SearchIcon, SparkleIcon } from '../../components/Icons'
@@ -6,7 +7,8 @@ import { Button, EmptyState, SpinnerDots } from '../../components/ui'
 import { useApiError } from '../../contexts/ApiErrorContext'
 import { useToast } from '../../contexts/ToastContext'
 import { GroupPanel, materialApi, materialGroupApi, MaterialCard } from '../../features/materials'
-import type { GroupItem, MaterialResponse } from '../../features/materials'
+import { queryKeys } from '../../lib/queryKeys'
+import { useQueryWithError } from '../../lib/useQueryWithError'
 
 export default function MaterialsPage() {
   const navigate = useNavigate()
@@ -14,48 +16,47 @@ export default function MaterialsPage() {
   const storyId = Number(id)
   const { showError } = useApiError()
   const { showToast } = useToast()
+  const queryClient = useQueryClient()
 
-  const [groups, setGroups] = useState<GroupItem[]>([])
   const [activeGroup, setActiveGroup] = useState<string>('')
-  const [materials, setMaterials] = useState<MaterialResponse[]>([])
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<'desc' | 'asc'>('desc')
-  const [loading, setLoading] = useState(true)
+
+  const { data: groups = [], isLoading: groupsLoading } = useQueryWithError({
+    queryKey: queryKeys.materialGroups(storyId),
+    queryFn: () =>
+      materialGroupApi.getGroups(storyId).then((list) =>
+        list.map((g) => ({ id: String(g.id), label: g.name })),
+      ),
+  })
 
   useEffect(() => {
-    materialGroupApi
-      .getGroups(storyId)
-      .then((list) => {
-        const mapped = list.map((g) => ({ id: String(g.id), label: g.name }))
-        setGroups(mapped)
-        if (mapped.length > 0) setActiveGroup(mapped[0].id)
-      })
-      .catch(showError)
-      .finally(() => setLoading(false))
-  }, [storyId, showError])
+    if (groups.length > 0 && !activeGroup) setActiveGroup(groups[0].id)
+  }, [groups, activeGroup])
 
-  useEffect(() => {
-    if (!activeGroup) return
-    const groupId = Number(activeGroup)
-    materialApi
-      .getMaterials(storyId, { groupId, search: search || undefined, sort })
-      .then(setMaterials)
-      .catch(showError)
-  }, [storyId, activeGroup, search, sort, showError])
+  const { data: materials = [], isLoading: materialsLoading } = useQueryWithError({
+    queryKey: [...queryKeys.materials(storyId), { groupId: Number(activeGroup), search, sort }],
+    queryFn: () =>
+      materialApi.getMaterials(storyId, {
+        groupId: Number(activeGroup),
+        search: search || undefined,
+        sort,
+      }),
+    enabled: !!activeGroup,
+  })
 
   async function handleAddGroup(name: string) {
     try {
       const group = await materialGroupApi.createGroup(storyId, { name })
-      const item = { id: String(group.id), label: group.name }
-      setGroups((prev) => [...prev, item])
-      setActiveGroup(item.id)
+      await queryClient.invalidateQueries({ queryKey: queryKeys.materialGroups(storyId) })
+      setActiveGroup(String(group.id))
       showToast('グループを追加しました')
     } catch (e) {
       showError(e)
     }
   }
 
-  const filtered = search ? materials.filter((m) => m.name.includes(search)) : materials
+  const loading = groupsLoading || (!!activeGroup && materialsLoading)
 
   return (
     <div className="flex h-full">
@@ -101,11 +102,11 @@ export default function MaterialsPage() {
             <div className="flex-1 flex justify-center pt-32">
               <SpinnerDots size="md" />
             </div>
-          ) : filtered.length === 0 ? (
+          ) : materials.length === 0 ? (
             <EmptyState message="素材がありません。「素材を生成」から作成しましょう。" />
           ) : (
             <div className="flex flex-wrap gap-3">
-              {filtered.map((m) => (
+              {materials.map((m) => (
                 <MaterialCard
                   key={m.id}
                   title={m.name}

@@ -1,6 +1,7 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { BookIcon, BellIcon, LogOutIcon } from '../components/Icons'
 import { useAuth } from '../contexts/AuthContext'
+import { GlobalLoadingBar } from '../components/ui'
 
 function TopNav() {
   const navigate = useNavigate()
@@ -43,6 +44,7 @@ function TopNav() {
 export default function DashboardLayout() {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white">
+      <GlobalLoadingBar />
       <TopNav />
       <main className="flex-1 overflow-y-auto bg-white">
         <Outlet />

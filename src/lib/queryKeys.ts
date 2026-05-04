@@ -1,0 +1,15 @@
+export const queryKeys = {
+  stories: () => ['stories'] as const,
+  story: (id: number) => ['stories', id] as const,
+  characters: (storyId: number) => ['stories', storyId, 'characters'] as const,
+  character: (storyId: number, charId: number) => ['stories', storyId, 'characters', charId] as const,
+  episodes: (storyId: number) => ['stories', storyId, 'episodes'] as const,
+  episode: (storyId: number, epId: number) => ['stories', storyId, 'episodes', epId] as const,
+  episodePages: (storyId: number, epId: number) => ['stories', storyId, 'episodes', epId, 'pages'] as const,
+  genres: () => ['genres'] as const,
+  materialGroups: (storyId: number) => ['stories', storyId, 'material-groups'] as const,
+  materials: (storyId: number) => ['stories', storyId, 'materials'] as const,
+  relationships: (storyId: number) => ['stories', storyId, 'relationships'] as const,
+  publishSettings: (storyId: number) => ['stories', storyId, 'publish'] as const,
+  jobs: (params: Record<string, unknown>) => ['jobs', params] as const,
+}

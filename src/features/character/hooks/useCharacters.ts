@@ -1,19 +1,13 @@
-import { useEffect, useState } from 'react'
-
-import { useApiError } from '../../../contexts/ApiErrorContext'
+import { queryKeys } from '../../../lib/queryKeys'
+import { useQueryWithError } from '../../../lib/useQueryWithError'
 import { characterApi, toCharacterDetail } from '../api/characterApi'
 import type { CharacterDetail } from '../types'
 
 export function useCharacters(storyId: number): CharacterDetail[] {
-  const [characters, setCharacters] = useState<CharacterDetail[]>([])
-  const { showError } = useApiError()
-
-  useEffect(() => {
-    characterApi
-      .getCharacters(storyId)
-      .then((list) => setCharacters(list.map(toCharacterDetail)))
-      .catch(showError)
-  }, [storyId, showError])
-
-  return characters
+  const { data = [] } = useQueryWithError({
+    queryKey: queryKeys.characters(storyId),
+    queryFn: () => characterApi.getCharacters(storyId),
+    select: (list) => list.map(toCharacterDetail),
+  })
+  return data
 }

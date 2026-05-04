@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { ArrowLeftIcon, EditIcon, TrashIcon } from '../../components/Icons'
 import { Button, CharacterAvatar, ConfirmDialog, SpinnerDots } from '../../components/ui'
 import { useApiError } from '../../contexts/ApiErrorContext'
 import { useToast } from '../../contexts/ToastContext'
-import type { CharacterDetail } from '../../features/character'
 import { DesignSection, InfoGrid } from '../../features/character'
 import { characterApi, toCharacterDetail } from '../../features/character'
+import { queryKeys } from '../../lib/queryKeys'
+import { useQueryWithError } from '../../lib/useQueryWithError'
 
 export default function CharacterEditPage() {
   const navigate = useNavigate()
@@ -16,23 +18,20 @@ export default function CharacterEditPage() {
   const characterId = Number(charId)
   const { showError } = useApiError()
   const { showToast } = useToast()
+  const queryClient = useQueryClient()
 
-  const [character, setCharacter] = useState<CharacterDetail | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
 
-  useEffect(() => {
-    characterApi
-      .getCharacter(storyId, characterId)
-      .then((r) => {
-        setCharacter(toCharacterDetail(r))
-      })
-      .catch(showError)
-  }, [storyId, characterId, showError])
+  const { data: character } = useQueryWithError({
+    queryKey: queryKeys.character(storyId, characterId),
+    queryFn: () => characterApi.getCharacter(storyId, characterId).then(toCharacterDetail),
+  })
 
   async function handleDeleteConfirm() {
     try {
       await characterApi.deleteCharacter(storyId, characterId)
+      queryClient.invalidateQueries({ queryKey: queryKeys.characters(storyId) })
       showToast('キャラクターを削除しました')
       navigate(`/stories/${id}/characters`)
     } catch (e) {
@@ -46,8 +45,7 @@ export default function CharacterEditPage() {
     setIsGenerating(true)
     try {
       await characterApi.generateThreeView(storyId, characterId)
-      const updated = await characterApi.getCharacter(storyId, characterId)
-      setCharacter(toCharacterDetail(updated))
+      await queryClient.invalidateQueries({ queryKey: queryKeys.character(storyId, characterId) })
       showToast('三面図を生成しました')
     } catch (e) {
       showError(e)

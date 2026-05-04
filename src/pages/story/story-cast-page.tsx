@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { queryKeys } from '../../lib/queryKeys'
+import { useQueryWithError } from '../../lib/useQueryWithError'
 
 import { inputClass, SectionCard, SpinnerDots } from '../../components/ui'
 import { useApiError } from '../../contexts/ApiErrorContext'
@@ -51,42 +54,51 @@ export default function StoryCastPage() {
   const storyId = Number(id)
   const { showError } = useApiError()
   const { showToast } = useToast()
+  const queryClient = useQueryClient()
 
   const [editingSection, setEditingSection] = useState<SectionKey | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [initialized, setInitialized] = useState(false)
   const [characters, setCharacters] = useState<CharacterItem[]>([])
   const [charactersDraft, setCharactersDraft] = useState<CharacterItem[]>([])
   const [selectedCharacterId, setSelectedCharacterId] = useState<number | null>(null)
   const [highlightedCharacterId, setHighlightedCharacterId] = useState<number | null>(null)
   const [selectedArchetypeRole, setSelectedArchetypeRole] = useState<ArchetypeRole | null>(null)
   const [relationships, setRelationships] = useState<CharacterRelationshipResponse[]>([])
-  const [loading, setLoading] = useState(true)
+
+  const { data: charactersData, isLoading: charsLoading } = useQueryWithError({
+    queryKey: queryKeys.characters(storyId),
+    queryFn: () => characterApi.getCharacters(storyId),
+    select: (list: CharacterResponse[]) =>
+      list
+        .map((c) => ({
+          id: c.id,
+          initials: c.name.charAt(0),
+          name: c.name,
+          role: c.role ?? '',
+          isProtagonist: c.isProtagonist,
+          archetypeRole: c.archetypeRole,
+        }))
+        .sort((a, b) => {
+          if (a.isProtagonist !== b.isProtagonist) return a.isProtagonist ? -1 : 1
+          return a.id - b.id
+        }) as CharacterItem[],
+  })
+
+  const { data: relationshipsData, isLoading: relsLoading } = useQueryWithError({
+    queryKey: queryKeys.relationships(storyId),
+    queryFn: () => relationshipApi.getRelationships(storyId),
+  })
 
   useEffect(() => {
-    Promise.all([
-      characterApi.getCharacters(storyId),
-      relationshipApi.getRelationships(storyId),
-    ])
-      .then(([list, rels]: [CharacterResponse[], CharacterRelationshipResponse[]]) => {
-        const mapped = list
-          .map((c) => ({
-            id: c.id,
-            initials: c.name.charAt(0),
-            name: c.name,
-            role: c.role ?? '',
-            isProtagonist: c.isProtagonist,
-            archetypeRole: c.archetypeRole,
-          }))
-          .sort((a, b) => {
-            if (a.isProtagonist !== b.isProtagonist) return a.isProtagonist ? -1 : 1
-            return a.id - b.id
-          })
-        setCharacters(mapped)
-        setCharactersDraft(mapped)
-        setRelationships(rels)
-      })
-      .catch(showError)
-      .finally(() => setLoading(false))
-  }, [storyId, showError])
+    if (!charactersData || !relationshipsData || initialized) return
+    setCharacters(charactersData)
+    setCharactersDraft(charactersData)
+    setRelationships(relationshipsData)
+    setInitialized(true)
+  }, [charactersData, relationshipsData, initialized])
+
+  const isLoading = charsLoading || relsLoading
 
   function startEdit(section: SectionKey) {
     if (section === 'characters') setCharactersDraft(characters)
@@ -94,20 +106,35 @@ export default function StoryCastPage() {
   }
 
   async function commitEdit(section: SectionKey) {
+    setSubmitting(true)
     try {
-      if (section === 'characters') setCharacters(charactersDraft)
+      if (section === 'characters') {
+        const changed = charactersDraft.filter((draft) => {
+          const orig = characters.find((c) => c.id === draft.id)
+          return orig && (orig.name !== draft.name || orig.role !== draft.role)
+        })
+        await Promise.all(
+          changed.map((c) =>
+            characterApi.updateCharacter(storyId, c.id, { name: c.name, role: c.role || undefined }),
+          ),
+        )
+        setCharacters(charactersDraft)
+        queryClient.invalidateQueries({ queryKey: queryKeys.characters(storyId) })
+      }
       showToast('保存しました')
+      setEditingSection(null)
     } catch (e) {
       showError(e)
+    } finally {
+      setSubmitting(false)
     }
-    setEditingSection(null)
   }
 
   function updateCharacterDraft(id: number, field: 'name' | 'role' | 'initials', value: string) {
     setCharactersDraft((prev) => prev.map((c) => (c.id === id ? { ...c, [field]: value } : c)))
   }
 
-  if (loading) return (
+  if (isLoading) return (
     <div className="flex-1 flex justify-center pt-32">
       <SpinnerDots size="md" />
     </div>
@@ -127,6 +154,7 @@ export default function StoryCastPage() {
                 onEdit={() => startEdit('characters')}
                 onDone={() => commitEdit('characters')}
                 onCancel={() => setEditingSection(null)}
+                submitting={submitting}
               />
             }
           >

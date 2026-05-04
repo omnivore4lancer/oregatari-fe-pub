@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { queryKeys } from '../../lib/queryKeys'
+import { useQueryWithError } from '../../lib/useQueryWithError'
 
 import { ArrowLeftIcon } from '../../components/Icons'
 import { useApiError } from '../../contexts/ApiErrorContext'
@@ -20,8 +22,6 @@ import {
   VisualElementsSection,
   WEATHER_OPTIONS,
 } from '../../features/materials'
-import type { GroupItem } from '../../features/materials'
-
 export default function MaterialCreatePage() {
   const navigate = useNavigate()
   const { id } = useParams()
@@ -29,7 +29,13 @@ export default function MaterialCreatePage() {
   const { showError } = useApiError()
   const { showToast } = useToast()
 
-  const [groups, setGroups] = useState<GroupItem[]>([])
+  const { data: groups = [] } = useQueryWithError({
+    queryKey: queryKeys.materialGroups(storyId),
+    queryFn: () =>
+      materialGroupApi.getGroups(storyId).then((list) =>
+        list.map((g) => ({ id: String(g.id), label: g.name })),
+      ),
+  })
 
   const [basic, setBasic] = useState<MaterialBasicForm>({
     name: '',
@@ -66,15 +72,10 @@ export default function MaterialCreatePage() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    materialGroupApi
-      .getGroups(storyId)
-      .then((list) => {
-        const mapped = list.map((g) => ({ id: String(g.id), label: g.name }))
-        setGroups(mapped)
-        if (mapped.length > 0) setBasic((prev) => ({ ...prev, groupId: mapped[0].id }))
-      })
-      .catch(showError)
-  }, [storyId, showError])
+    if (groups.length > 0 && !basic.groupId) {
+      setBasic((prev) => ({ ...prev, groupId: groups[0].id }))
+    }
+  }, [groups, basic.groupId])
 
   function handleBack() {
     navigate(`/stories/${id}/materials`)

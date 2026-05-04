@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -21,7 +21,8 @@ import {
 } from '../../features/character'
 import type { CharacterDraft } from '../../features/character'
 import { genreApi, LABEL_TO_ERA, storyApi } from '../../features/story'
-import type { Genre } from '../../features/story'
+import { queryKeys } from '../../lib/queryKeys'
+import { useQueryWithError } from '../../lib/useQueryWithError'
 
 const MAX_GENRES = 3
 const ERA_OPTIONS = ['現代', '古代/中世', '未来/SF']
@@ -41,7 +42,6 @@ export default function StoryCreatePage() {
   const { showToast } = useToast()
 
   const [step, setStep] = useState<StepIndex>(0)
-  const [genres, setGenres] = useState<Genre[]>([])
   const [selectedGenreIds, setSelectedGenreIds] = useState<number[]>([])
   const [storyName, setStoryName] = useState('')
   const [protagonist, setProtagonist] = useState<CharacterDraft>(emptyCharacter())
@@ -52,9 +52,10 @@ export default function StoryCreatePage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    genreApi.getGenres().then(setGenres).catch(showError)
-  }, [showError])
+  const { data: genres = [] } = useQueryWithError({
+    queryKey: queryKeys.genres(),
+    queryFn: () => genreApi.getGenres(),
+  })
 
   function toggleGenre(id: number) {
     setSelectedGenreIds((prev) => {

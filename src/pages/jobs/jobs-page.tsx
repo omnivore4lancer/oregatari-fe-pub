@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { SpinnerDots, StatusBadge } from '../../components/ui'
-import { useApiError } from '../../contexts/ApiErrorContext'
 import { jobApi } from '../../features/jobs'
-import type { JobListItem, JobStatus, JobType } from '../../features/jobs'
+import type { JobStatus, JobType } from '../../features/jobs'
+import { queryKeys } from '../../lib/queryKeys'
+import { useQueryWithError } from '../../lib/useQueryWithError'
 
 const JOB_TYPE_LABEL: Record<JobType, string> = {
   IMAGE_GENERATION: '画像生成',
@@ -37,36 +38,24 @@ function relativeTime(iso: string): string {
 const PAGE_SIZE = 50
 
 export default function JobsPage() {
-  const { showError } = useApiError()
-  const [jobs, setJobs] = useState<JobListItem[]>([])
-  const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState<JobStatus | ''>('')
   const [jobTypeFilter, setJobTypeFilter] = useState<JobType | ''>('')
 
-  useEffect(() => {
-    setLoading(true)
-    jobApi
-      .getJobs({
+  const { data, isLoading } = useQueryWithError({
+    queryKey: queryKeys.jobs({ page, status: statusFilter || undefined, jobType: jobTypeFilter || undefined }),
+    queryFn: () =>
+      jobApi.getJobs({
         page,
         limit: PAGE_SIZE,
         status: statusFilter || undefined,
         jobType: jobTypeFilter || undefined,
-      })
-      .then((res) => {
-        setJobs(res.jobs)
-        setTotal(res.total)
-      })
-      .catch(showError)
-      .finally(() => setLoading(false))
-  }, [page, statusFilter, jobTypeFilter, showError])
+      }),
+  })
 
+  const jobs = data?.jobs ?? []
+  const total = data?.total ?? 0
   const totalPages = Math.ceil(total / PAGE_SIZE)
-
-  function handleFilterChange() {
-    setPage(1)
-  }
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -75,12 +64,11 @@ export default function JobsPage() {
         <span className="text-[13px] text-[var(--text)]">全 {total} 件</span>
       </div>
 
-      {/* フィルタ */}
       <div className="flex gap-3 mb-4">
         <select
           className="text-[13px] border border-[var(--border)] rounded-lg px-3 py-1.5 bg-white text-[var(--text)]"
           value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value as JobStatus | ''); handleFilterChange() }}
+          onChange={(e) => { setStatusFilter(e.target.value as JobStatus | ''); setPage(1) }}
         >
           <option value="">すべてのステータス</option>
           <option value="RUNNING">実行中</option>
@@ -90,7 +78,7 @@ export default function JobsPage() {
         <select
           className="text-[13px] border border-[var(--border)] rounded-lg px-3 py-1.5 bg-white text-[var(--text)]"
           value={jobTypeFilter}
-          onChange={(e) => { setJobTypeFilter(e.target.value as JobType | ''); handleFilterChange() }}
+          onChange={(e) => { setJobTypeFilter(e.target.value as JobType | ''); setPage(1) }}
         >
           <option value="">すべての種別</option>
           <option value="IMAGE_GENERATION">画像生成</option>
@@ -99,7 +87,7 @@ export default function JobsPage() {
         </select>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex justify-center py-16">
           <SpinnerDots size="md" />
         </div>

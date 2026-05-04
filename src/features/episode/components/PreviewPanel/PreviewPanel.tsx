@@ -1,15 +1,28 @@
+import { EyeIcon } from '../../../../components/Icons'
 import { SpinnerDots } from '../../../../components/ui'
 import type { Episode } from '../../types'
 
 interface PreviewPanelProps {
   episode: Episode | null
+  onViewManga?: () => void
 }
 
-export function PreviewPanel({ episode }: PreviewPanelProps) {
+export function PreviewPanel({ episode, onViewManga }: PreviewPanelProps) {
   return (
     <aside className="w-[50%] shrink-0 border-l border-[var(--border)] bg-[var(--bg)] flex flex-col">
-      <div className="px-4 py-3 border-b border-[var(--border)]">
+      <div className="px-4 py-3 border-b border-[var(--border)] flex items-center">
         <h2 className="text-[14px] font-bold text-[var(--text-h)] m-0">プレビュー</h2>
+        <div className="flex-1" />
+        {episode?.hasScenes && onViewManga && (
+          <button
+            type="button"
+            onClick={onViewManga}
+            className="flex items-center gap-1 px-2 py-0.5 rounded border border-teal-300 bg-teal-50 text-[10px] font-medium text-teal-700 hover:bg-teal-100 hover:border-teal-400 transition-colors cursor-pointer"
+          >
+            <EyeIcon size={10} />
+            ビューアー
+          </button>
+        )}
       </div>
       {episode === null || episode.generatingState === 'generating' ? (
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">

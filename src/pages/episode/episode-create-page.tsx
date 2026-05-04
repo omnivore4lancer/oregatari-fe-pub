@@ -9,7 +9,6 @@ import { useCharacters } from '../../features/character'
 import {
   AiPanel,
   CharacterSelectSection,
-  type Episode,
   EpisodeDetailSection,
   EPISODE_TYPE,
   EPISODE_TYPE_LABEL,
@@ -20,6 +19,8 @@ import {
   StepNav,
 } from '../../features/episode'
 import { episodeApi, toEpisode } from '../../features/episode'
+import { queryKeys } from '../../lib/queryKeys'
+import { useQueryWithError } from '../../lib/useQueryWithError'
 
 type StreamingState = 'idle' | 'streaming' | 'done'
 
@@ -30,7 +31,10 @@ export default function EpisodeCreatePage() {
   const { showError } = useApiError()
   const { showToast } = useToast()
 
-  const [episodes, setEpisodes] = useState<Episode[]>([])
+  const { data: episodes = [] } = useQueryWithError({
+    queryKey: queryKeys.episodes(storyId),
+    queryFn: () => episodeApi.getEpisodes(storyId).then((list) => list.map(toEpisode)),
+  })
   const allCharacters = useCharacters(storyId)
 
   const [selectedType, setSelectedType] = useState<EpisodeType>(null)
@@ -45,15 +49,10 @@ export default function EpisodeCreatePage() {
   const [streamingText, setStreamingText] = useState('')
 
   useEffect(() => {
-    episodeApi
-      .getEpisodes(storyId)
-      .then((list) => {
-        const mapped = list.map(toEpisode)
-        setEpisodes(mapped)
-        if (mapped.length > 0) setParentEpisodeId(mapped[0].id)
-      })
-      .catch(showError)
-  }, [storyId, showError])
+    if (episodes.length > 0 && parentEpisodeId === null) {
+      setParentEpisodeId(episodes[0].id)
+    }
+  }, [episodes, parentEpisodeId])
 
   function handleBack() {
     navigate(`/stories/${id}/episodes`)

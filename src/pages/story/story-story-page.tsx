@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
 import { Button, SectionCard, SpinnerDots, textareaClass } from '../../components/ui'
@@ -6,6 +7,8 @@ import { useApiError } from '../../contexts/ApiErrorContext'
 import { useToast } from '../../contexts/ToastContext'
 import { EditingActions, storyApi, StorySectionBlock } from '../../features/story'
 import type { SectionKey } from '../../features/story'
+import { queryKeys } from '../../lib/queryKeys'
+import { useQueryWithError } from '../../lib/useQueryWithError'
 
 type StorySections = { intro: string; dev: string; climax: string; conclusion: string }
 
@@ -39,37 +42,41 @@ export default function StoryStoryPage() {
   const storyId = Number(id)
   const { showError } = useApiError()
   const { showToast } = useToast()
+  const queryClient = useQueryClient()
 
   const [editingSection, setEditingSection] = useState<SectionKey | null>(null)
+  const [submitting, setSubmitting] = useState(false)
   const [activeStoryTab, setActiveStoryTab] = useState(0)
+  const [initialized, setInitialized] = useState(false)
   const [eraBg, setEraBg] = useState('')
   const [eraDraft, setEraDraft] = useState('')
   const [story, setStory] = useState<StorySections>({ intro: '', dev: '', climax: '', conclusion: '' })
   const [storyDraft, setStoryDraft] = useState<StorySections>({ intro: '', dev: '', climax: '', conclusion: '' })
   const [generating, setGenerating] = useState(false)
   const [streamText, setStreamText] = useState('')
-  const [loading, setLoading] = useState(true)
   const streamRef = useRef<HTMLDivElement>(null)
 
+  const { data, isLoading } = useQueryWithError({
+    queryKey: queryKeys.story(storyId),
+    queryFn: () => storyApi.getStory(storyId),
+    staleTime: 0,
+  })
+
   useEffect(() => {
-    storyApi
-      .getStory(storyId)
-      .then((s) => {
-        const bg = s.eraBg ?? ''
-        setEraBg(bg)
-        setEraDraft(bg)
-        const sections = {
-          intro: s.intro ?? '',
-          dev: s.dev ?? '',
-          climax: s.climax ?? '',
-          conclusion: s.conclusion ?? '',
-        }
-        setStory(sections)
-        setStoryDraft(sections)
-      })
-      .catch(showError)
-      .finally(() => setLoading(false))
-  }, [storyId, showError])
+    if (!data || initialized) return
+    const bg = data.eraBg ?? ''
+    setEraBg(bg)
+    setEraDraft(bg)
+    const sections = {
+      intro: data.intro ?? '',
+      dev: data.dev ?? '',
+      climax: data.climax ?? '',
+      conclusion: data.conclusion ?? '',
+    }
+    setStory(sections)
+    setStoryDraft(sections)
+    setInitialized(true)
+  }, [data, initialized])
 
   function startEdit(section: SectionKey) {
     if (section === 'era') setEraDraft(eraBg)
@@ -78,6 +85,7 @@ export default function StoryStoryPage() {
   }
 
   async function commitEdit(section: SectionKey) {
+    setSubmitting(true)
     try {
       if (section === 'era') {
         setEraBg(eraDraft)
@@ -87,11 +95,14 @@ export default function StoryStoryPage() {
         setStory(storyDraft)
         await storyApi.updateStory(storyId, storyDraft)
       }
+      queryClient.invalidateQueries({ queryKey: queryKeys.story(storyId) })
       showToast('保存しました')
+      setEditingSection(null)
     } catch (e) {
       showError(e)
+    } finally {
+      setSubmitting(false)
     }
-    setEditingSection(null)
   }
 
   async function handleGenerate() {
@@ -108,8 +119,10 @@ export default function StoryStoryPage() {
         })
       })
       const s = await storyApi.getStory(storyId)
-      setEraBg(s.eraBg ?? '')
-      setEraDraft(s.eraBg ?? '')
+      queryClient.setQueryData(queryKeys.story(storyId), s)
+      const bg = s.eraBg ?? ''
+      setEraBg(bg)
+      setEraDraft(bg)
       const sections = {
         intro: s.intro ?? '',
         dev: s.dev ?? '',
@@ -126,7 +139,7 @@ export default function StoryStoryPage() {
     }
   }
 
-  if (loading) return (
+  if (isLoading) return (
     <>
       <StoryEditTabs storyId={storyId} />
       <div className="flex-1 flex justify-center pt-32">
@@ -149,6 +162,7 @@ export default function StoryStoryPage() {
                 onEdit={() => startEdit('era')}
                 onDone={() => commitEdit('era')}
                 onCancel={() => setEditingSection(null)}
+                submitting={submitting}
               />
             }
           >
@@ -184,6 +198,7 @@ export default function StoryStoryPage() {
                   onEdit={() => startEdit('story')}
                   onDone={() => commitEdit('story')}
                   onCancel={() => setEditingSection(null)}
+                  submitting={submitting}
                 />
               </div>
             }

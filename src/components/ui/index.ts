@@ -1,6 +1,7 @@
 export { OptionalBadge, RequiredBadge } from './form/Badge/Badge'
 export { Button } from './action/Button/Button'
 export { ConfirmDialog } from './feedback/ConfirmDialog/ConfirmDialog'
+export { GlobalLoadingBar } from './feedback/GlobalLoadingBar/GlobalLoadingBar'
 export { CharacterAvatar } from './display/CharacterAvatar/CharacterAvatar'
 export { DashedAddButton } from './action/DashedAddButton/DashedAddButton'
 export { EmptyState } from './feedback/EmptyState/EmptyState'

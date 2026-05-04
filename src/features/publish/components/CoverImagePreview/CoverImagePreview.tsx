@@ -1,14 +1,16 @@
+import React from 'react'
 import { SpinnerDots } from '../../../../components/ui'
 import { SectionCard } from '../../../../components/ui'
 
 interface Props {
   isGenerating: boolean
   imageUrl: string | null
+  headerActions?: React.ReactNode
 }
 
-export function CoverImagePreview({ isGenerating, imageUrl }: Props) {
+export function CoverImagePreview({ isGenerating, imageUrl, headerActions }: Props) {
   return (
-    <SectionCard title="表紙画像">
+    <SectionCard title="表紙画像" headerActions={headerActions}>
       <div className="mb-4" />
       <div className="w-full aspect-[3/4] rounded-xl border border-dashed border-[var(--border)] flex items-center justify-center overflow-hidden">
         {isGenerating ? (

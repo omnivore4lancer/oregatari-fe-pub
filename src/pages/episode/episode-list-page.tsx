@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { PlusIcon } from '../../components/Icons'
@@ -13,6 +14,8 @@ import {
   PreviewPanel,
 } from '../../features/episode'
 import { episodeApi, toEpisode } from '../../features/episode'
+import { publishApi } from '../../features/publish'
+import { queryKeys } from '../../lib/queryKeys'
 
 export default function EpisodeListPage() {
   const navigate = useNavigate()
@@ -21,15 +24,49 @@ export default function EpisodeListPage() {
   const storyId = Number(id)
   const { showError } = useApiError()
   const { showToast } = useToast()
+  const queryClient = useQueryClient()
 
-  const [episodes, setEpisodes] = useState<Episode[]>([])
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all')
-  const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null)
+  const [selectedEpisodeId, setSelectedEpisodeId] = useState<number | null>(null)
   const [deletingEpisode, setDeletingEpisode] = useState<Episode | null>(null)
   const [publishTarget, setPublishTarget] = useState<{ episode: Episode; action: 'publish' | 'unpublish' } | null>(null)
-  const [polling, setPolling] = useState(() => !!(location.state as { backgroundGenerating?: boolean } | null)?.backgroundGenerating)
-  const [loading, setLoading] = useState(true)
+  const [polling, setPolling] = useState(
+    () => !!(location.state as { backgroundGenerating?: boolean } | null)?.backgroundGenerating,
+  )
   const prevCountRef = useRef<number | null>(null)
+
+  const { data: episodes = [], isLoading, error } = useQuery({
+    queryKey: queryKeys.episodes(storyId),
+    queryFn: () => episodeApi.getEpisodes(storyId).then((list) => list.map(toEpisode)),
+    refetchInterval: polling ? 5000 : false,
+    refetchIntervalInBackground: false,
+  })
+
+  // ポーリング中のエラーは無視し、初回ロード失敗時のみ表示
+  useEffect(() => {
+    if (error && episodes.length === 0) showError(error)
+  }, [error, episodes.length, showError])
+
+  // 初回データロード時に先頭を選択
+  useEffect(() => {
+    if (episodes.length > 0 && selectedEpisodeId === null) {
+      setSelectedEpisodeId(episodes[0].id)
+    }
+  }, [episodes, selectedEpisodeId])
+
+  // バックグラウンド生成の完了検出
+  useEffect(() => {
+    if (!polling || episodes.length === 0) return
+    const hasGenerating = episodes.some((ep) => ep.generatingState === 'generating')
+    const countIncreased = prevCountRef.current !== null && episodes.length > prevCountRef.current
+    prevCountRef.current = episodes.length
+    if (countIncreased || !hasGenerating) {
+      setPolling(false)
+      if (countIncreased) showToast('エピソードの生成が完了しました')
+    }
+  }, [episodes, polling, showToast])
+
+  const selectedEpisode = episodes.find((ep) => ep.id === selectedEpisodeId) ?? null
 
   function handleComicEdit(ep: Episode) {
     navigate(`/stories/${id}/episodes/${ep.id}/scenes`)
@@ -39,9 +76,9 @@ export default function EpisodeListPage() {
     if (!deletingEpisode) return
     try {
       await episodeApi.deleteEpisode(storyId, deletingEpisode.id)
-      setEpisodes((prev) => prev.filter((e) => e.id !== deletingEpisode.id))
-      if (selectedEpisode?.id === deletingEpisode.id) setSelectedEpisode(null)
+      if (selectedEpisodeId === deletingEpisode.id) setSelectedEpisodeId(null)
       showToast('エピソードを削除しました')
+      queryClient.invalidateQueries({ queryKey: queryKeys.episodes(storyId) })
     } catch (e) {
       showError(e)
     } finally {
@@ -53,53 +90,28 @@ export default function EpisodeListPage() {
     if (!publishTarget) return
     const { episode, action } = publishTarget
     try {
-      const updated = action === 'publish'
-        ? await episodeApi.publishEpisode(storyId, episode.id)
-        : await episodeApi.unpublishEpisode(storyId, episode.id)
-      const updatedEpisode = toEpisode(updated)
-      setEpisodes((prev) => prev.map((e) => e.id === episode.id ? updatedEpisode : e))
-      if (selectedEpisode?.id === episode.id) setSelectedEpisode(updatedEpisode)
-      showToast(action === 'publish' ? '公開しました' : '公開を取り下げました')
+      await (action === 'publish'
+        ? episodeApi.publishEpisode(storyId, episode.id)
+        : episodeApi.unpublishEpisode(storyId, episode.id))
+
+      if (action === 'publish') {
+        const settings = await publishApi.getPublishSettings(storyId)
+        if (!settings?.publishedAt) {
+          await publishApi.publishStory(storyId)
+          showToast('エピソードを公開し、ストーリーも公開しました')
+        } else {
+          showToast('公開しました')
+        }
+      } else {
+        showToast('公開を取り下げました')
+      }
+      queryClient.invalidateQueries({ queryKey: queryKeys.episodes(storyId) })
     } catch (e) {
       showError(e)
     } finally {
       setPublishTarget(null)
     }
   }
-
-  useEffect(() => {
-    episodeApi
-      .getEpisodes(storyId)
-      .then((list) => {
-        const mapped = list.map(toEpisode)
-        setEpisodes(mapped)
-        if (mapped.length > 0) setSelectedEpisode(mapped[0])
-        prevCountRef.current = mapped.length
-      })
-      .catch(showError)
-      .finally(() => setLoading(false))
-  }, [storyId, showError])
-
-  useEffect(() => {
-    if (!polling) return
-    const timer = setInterval(async () => {
-      try {
-        const list = await episodeApi.getEpisodes(storyId)
-        const mapped = list.map(toEpisode)
-        const hasGenerating = mapped.some((ep) => ep.generatingState === 'generating')
-        const countIncreased = prevCountRef.current !== null && mapped.length > prevCountRef.current
-        prevCountRef.current = mapped.length
-        setEpisodes(mapped)
-        if (countIncreased || !hasGenerating) {
-          setPolling(false)
-          if (countIncreased) showToast('エピソードの生成が完了しました')
-        }
-      } catch {
-        // polling errors are silent
-      }
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [polling, storyId, showToast])
 
   const filtered =
     activeFilter === 'all'
@@ -142,7 +154,7 @@ export default function EpisodeListPage() {
           </div>
 
           <div className="flex flex-col gap-3">
-            {loading ? (
+            {isLoading ? (
               <div className="flex justify-center pt-32">
                 <SpinnerDots size="md" />
               </div>
@@ -156,7 +168,7 @@ export default function EpisodeListPage() {
                   key={ep.id}
                   type="button"
                   className="text-left w-full"
-                  onClick={() => setSelectedEpisode(ep)}
+                  onClick={() => setSelectedEpisodeId(ep.id)}
                 >
                   <EpisodeCard
                     episode={ep}
@@ -180,7 +192,14 @@ export default function EpisodeListPage() {
         </div>
       </div>
 
-      <PreviewPanel episode={selectedEpisode} />
+      <PreviewPanel
+        episode={selectedEpisode}
+        onViewManga={
+          selectedEpisode?.hasScenes
+            ? () => navigate(`/stories/${id}/episodes/${selectedEpisode.id}/viewer`)
+            : undefined
+        }
+      />
 
       <ConfirmDialog
         open={!!deletingEpisode}

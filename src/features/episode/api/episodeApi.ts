@@ -60,6 +60,11 @@ export function toEpisode(r: EpisodeResponse): Episode {
   }
 }
 
+export interface EpisodeCharacterInput {
+  characterId: number
+  importance: number
+}
+
 export interface CreateEpisodeInput {
   number: number
   title: string
@@ -68,7 +73,7 @@ export interface CreateEpisodeInput {
   status?: EpisodeResponse['status']
   relation?: EpisodeResponse['relation']
   parentId?: number | null
-  characterIds?: number[]
+  characters?: EpisodeCharacterInput[]
   inheritRelation?: boolean
 }
 

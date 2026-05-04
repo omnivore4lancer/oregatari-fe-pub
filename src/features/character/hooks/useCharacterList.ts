@@ -1,7 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { useApiError } from '../../../contexts/ApiErrorContext'
 import { useToast } from '../../../contexts/ToastContext'
+import { queryKeys } from '../../../lib/queryKeys'
+import { useQueryWithError } from '../../../lib/useQueryWithError'
 import { characterApi, toCharacter, toCharacterDetail } from '../api/characterApi'
 import type { Character, CharacterDetail } from '../types'
 import type { CreateCharacterInput } from '../api/characterApi'
@@ -9,49 +12,48 @@ import type { CreateCharacterInput } from '../api/characterApi'
 export function useCharacterList(storyId: number) {
   const { showError } = useApiError()
   const { showToast } = useToast()
+  const queryClient = useQueryClient()
 
-  const [protagonist, setProtagonist] = useState<Character | null>(null)
-  const [subCharacters, setSubCharacters] = useState<Character[]>([])
-  const [listLoading, setListLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [detail, setDetail] = useState<CharacterDetail | null>(null)
-  const [detailLoading, setDetailLoading] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [deletingCharacter, setDeletingCharacter] = useState<Character | null>(null)
 
-  const loadList = useCallback(async () => {
-    const list = await characterApi.getCharacters(storyId)
-    const mapped = list.map(toCharacter)
-    const proto = mapped.find((_, i) => list[i].isProtagonist) ?? null
-    setProtagonist(proto)
-    setSubCharacters(mapped.filter((_, i) => !list[i].isProtagonist))
-    return proto
-  }, [storyId])
+  const listQuery = useQueryWithError({
+    queryKey: queryKeys.characters(storyId),
+    queryFn: () => characterApi.getCharacters(storyId),
+  })
+
+  const rawList = listQuery.data ?? []
+  const protagonistId = rawList.find((r) => r.isProtagonist)?.id ?? null
+  const protagonist = rawList.find((r) => r.isProtagonist)
+    ? toCharacter(rawList.find((r) => r.isProtagonist)!)
+    : null
+  const subCharacters = rawList.filter((r) => !r.isProtagonist).map(toCharacter)
 
   useEffect(() => {
-    setListLoading(true)
-    loadList()
-      .then((proto) => { if (proto) setSelectedId(proto.id) })
-      .catch(showError)
-      .finally(() => setListLoading(false))
-  }, [loadList, showError])
+    if (protagonistId !== null && selectedId === null) {
+      setSelectedId(protagonistId)
+    }
+  }, [protagonistId, selectedId])
 
-  useEffect(() => {
-    if (selectedId == null) { setDetail(null); return }
-    setDetailLoading(true)
-    characterApi
-      .getCharacter(storyId, selectedId)
-      .then((r) => setDetail(toCharacterDetail(r)))
-      .catch(showError)
-      .finally(() => setDetailLoading(false))
-  }, [storyId, selectedId, showError])
+  const detailQuery = useQueryWithError({
+    queryKey: queryKeys.character(storyId, selectedId ?? 0),
+    queryFn: () => characterApi.getCharacter(storyId, selectedId!),
+    enabled: selectedId != null,
+  })
+
+  const detail: CharacterDetail | null = detailQuery.data
+    ? toCharacterDetail(detailQuery.data)
+    : null
 
   async function handleFieldSave(updates: Partial<CreateCharacterInput>) {
     if (!selectedId) return
     try {
       const updated = await characterApi.updateCharacter(storyId, selectedId, updates)
-      setDetail(toCharacterDetail(updated))
-      if ('name' in updates || 'role' in updates) await loadList()
+      queryClient.setQueryData(queryKeys.character(storyId, selectedId), updated)
+      if ('name' in updates || 'role' in updates) {
+        await queryClient.invalidateQueries({ queryKey: queryKeys.characters(storyId) })
+      }
       showToast('保存しました')
     } catch (e) {
       showError(e)
@@ -64,9 +66,8 @@ export function useCharacterList(storyId: number) {
     setIsGenerating(true)
     try {
       await characterApi.generateThreeView(storyId, selectedId)
-      const updated = await characterApi.getCharacter(storyId, selectedId)
-      setDetail(toCharacterDetail(updated))
-      await loadList()
+      await queryClient.invalidateQueries({ queryKey: queryKeys.character(storyId, selectedId) })
+      await queryClient.invalidateQueries({ queryKey: queryKeys.characters(storyId) })
       showToast('三面図を生成しました')
     } catch (e) {
       showError(e)
@@ -81,7 +82,7 @@ export function useCharacterList(storyId: number) {
       await characterApi.deleteCharacter(storyId, deletingCharacter.id)
       showToast('キャラクターを削除しました')
       if (selectedId === deletingCharacter.id) setSelectedId(null)
-      await loadList()
+      await queryClient.invalidateQueries({ queryKey: queryKeys.characters(storyId) })
     } catch (e) {
       showError(e)
     } finally {
@@ -92,11 +93,11 @@ export function useCharacterList(storyId: number) {
   return {
     protagonist,
     subCharacters,
-    listLoading,
+    listLoading: listQuery.isLoading,
     selectedId,
     setSelectedId,
     detail,
-    detailLoading,
+    detailLoading: detailQuery.isLoading || detailQuery.isFetching,
     isGenerating,
     deletingCharacter,
     setDeletingCharacter,

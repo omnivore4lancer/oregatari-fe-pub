@@ -92,11 +92,10 @@ export default function EpisodeEditPage() {
         content: content.trim() || undefined,
         relation: selectedType === EPISODE_TYPE.SEQUEL ? 'SEQUEL' : 'STANDALONE',
         parentId: selectedType === EPISODE_TYPE.SEQUEL && parentEpisodeId ? parentEpisodeId : null,
-        characterIds,
+        characters: characterIds.map((id) => ({ characterId: id, importance: 50 })),
         inheritRelation: selectedType === EPISODE_TYPE.STANDALONE ? inheritRelation : undefined,
       })
       showToast('エピソードを保存しました')
-      navigate(`/stories/${id}/episodes`)
     } catch (e) {
       showError(e)
     } finally {
@@ -190,7 +189,7 @@ export default function EpisodeEditPage() {
                     キャンセル
                   </button>
                   <Button variant="primary" onClick={handleSave} disabled={submitting || !title.trim()}>
-                    保存
+                    {submitting ? '保存中...' : '保存'}
                   </Button>
                 </div>
               )}

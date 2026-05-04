@@ -5,26 +5,29 @@ interface EditingActionsProps {
   onEdit: () => void
   onDone: () => void
   onCancel: () => void
+  submitting?: boolean
   extra?: React.ReactNode
 }
 
-export function EditingActions({ editing, onEdit, onDone, onCancel, extra }: EditingActionsProps) {
+export function EditingActions({ editing, onEdit, onDone, onCancel, submitting, extra }: EditingActionsProps) {
   if (editing) {
     return (
       <>
         <button
           type="button"
           onClick={onCancel}
-          className="text-[12px] border border-[var(--border)] px-2 py-1 rounded cursor-pointer bg-transparent text-[var(--text)] hover:bg-gray-50 transition-colors"
+          disabled={submitting}
+          className="text-[12px] border border-[var(--border)] px-2 py-1 rounded cursor-pointer bg-transparent text-[var(--text)] hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           キャンセル
         </button>
         <button
           type="button"
           onClick={onDone}
-          className="text-[12px] border border-[var(--accent-border)] text-[var(--accent)] bg-[var(--accent-bg)] px-2 py-1 rounded cursor-pointer hover:bg-[var(--accent)] hover:text-white transition-colors"
+          disabled={submitting}
+          className="text-[12px] border border-[var(--accent-border)] text-[var(--accent)] bg-[var(--accent-bg)] px-2 py-1 rounded cursor-pointer hover:bg-[var(--accent)] hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          完了
+          {submitting ? '保存中...' : '完了'}
         </button>
       </>
     )

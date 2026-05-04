@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import {
@@ -18,6 +19,7 @@ import {
   characterApi,
 } from '../../features/character'
 import type { ArchetypeRole, CreateCharacterInput } from '../../features/character'
+import { queryKeys } from '../../lib/queryKeys'
 
 export default function CharacterCreatePage() {
   const navigate = useNavigate()
@@ -27,6 +29,7 @@ export default function CharacterCreatePage() {
   const characterId = isEdit ? Number(charId) : undefined
   const { showError } = useApiError()
   const { showToast } = useToast()
+  const queryClient = useQueryClient()
 
   const [name, setName] = useState('')
   const [role, setRole] = useState('')
@@ -100,10 +103,12 @@ export default function CharacterCreatePage() {
       }
       if (isEdit && characterId !== undefined) {
         await characterApi.updateCharacter(storyId, characterId, payload)
+        queryClient.invalidateQueries({ queryKey: queryKeys.characters(storyId) })
         showToast('キャラクターを保存しました')
         navigate(`/stories/${id}/characters/${charId}`)
       } else {
         await characterApi.createCharacter(storyId, payload)
+        queryClient.invalidateQueries({ queryKey: queryKeys.characters(storyId) })
         showToast('キャラクターを作成しました')
         navigate(`/stories/${id}/characters`)
       }
