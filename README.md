@@ -62,6 +62,10 @@ src/
 └── lib/                 # apiClient など低レベルユーティリティ
 ```
 
+## 参考ページ
+
+- [公開作品サンプル](https://oregatari-fe.vercel.app/works/1)
+
 ## 主要ページ
 
 | ページ | パス |

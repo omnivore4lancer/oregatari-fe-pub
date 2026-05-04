@@ -130,8 +130,17 @@ export function useSceneJobs(
 
   async function startImageJob(pageNumber: number) {
     if (generatingPages.has(pageNumber)) return
-    await episodePageApi.createImageJob(storyId, epId, pageNumber)
     setGeneratingPages((prev) => new Set([...prev, pageNumber]))
+    try {
+      await episodePageApi.createImageJob(storyId, epId, pageNumber)
+    } catch (e) {
+      setGeneratingPages((prev) => {
+        const next = new Set(prev)
+        next.delete(pageNumber)
+        return next
+      })
+      throw e
+    }
   }
 
   async function startLayoutJob() {

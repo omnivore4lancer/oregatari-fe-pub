@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 
-import { publicStoryApi, type PublicEpisode } from '../../features/public-story'
+import { PublicMangaViewer, publicStoryApi, type PublicEpisode } from '../../features/public-story'
 
 function SiteHeader() {
   return (
@@ -23,20 +24,6 @@ function SiteHeader() {
         </nav>
 
         <div className="flex-1" />
-
-        {/* 右側アクション */}
-        <div className="flex items-center gap-4 text-[13px]">
-          <span className="text-gray-500 cursor-default hover:text-gray-900 transition-colors">ヘルプ</span>
-          <Link to="/login" className="text-gray-600 hover:text-gray-900 no-underline transition-colors">
-            ログイン
-          </Link>
-          <Link
-            to="/login"
-            className="bg-blue-500 hover:bg-blue-600 text-white text-[12px] font-medium px-3 py-1.5 rounded no-underline transition-colors"
-          >
-            アカウント作成
-          </Link>
-        </div>
       </div>
     </header>
   )
@@ -56,25 +43,29 @@ function GenreChip({ name }: { name: string }) {
   )
 }
 
-function EpisodeCard({ episode }: { episode: PublicEpisode }) {
+function EpisodeCard({ episode, onClick }: { episode: PublicEpisode; onClick: () => void }) {
   return (
-    <div className="flex flex-col gap-1">
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex flex-col gap-1 text-left cursor-pointer bg-transparent border-0 p-0 group"
+    >
       <div className="aspect-[3/4] bg-gray-100 rounded overflow-hidden">
         {episode.thumbnailUrl ? (
           <img
             src={episode.thumbnailUrl}
             alt={episode.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">
+          <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs group-hover:bg-gray-200 transition-colors">
             No image
           </div>
         )}
       </div>
       <p className="text-xs text-gray-500">第{episode.number}話</p>
       <p className="text-xs font-medium text-gray-800 line-clamp-2">{episode.title}</p>
-    </div>
+    </button>
   )
 }
 
@@ -107,8 +98,13 @@ function Loading() {
 
 export default function PublicStoryPage() {
   const { storyId } = useParams<{ storyId: string }>()
+  const [viewingEpisode, setViewingEpisode] = useState<PublicEpisode | null>(null)
 
-  const { data: story, isLoading, isError } = useQuery({
+  const {
+    data: story,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ['public-story', Number(storyId)],
     queryFn: () => publicStoryApi.getStory(Number(storyId!)),
     enabled: !!storyId,
@@ -195,13 +191,21 @@ export default function PublicStoryPage() {
             ) : (
               <div className="grid grid-cols-4 gap-4">
                 {story.episodes.map((ep) => (
-                  <EpisodeCard key={ep.id} episode={ep} />
+                  <EpisodeCard key={ep.id} episode={ep} onClick={() => setViewingEpisode(ep)} />
                 ))}
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {viewingEpisode && (
+        <PublicMangaViewer
+          episode={viewingEpisode}
+          coverImageUrl={story.coverImageUrl}
+          onClose={() => setViewingEpisode(null)}
+        />
+      )}
     </div>
   )
 }
