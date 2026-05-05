@@ -17,11 +17,13 @@ function SiteHeader() {
         </Link>
 
         {/* ナビ */}
-        <nav className="flex items-center gap-6 text-[13px] text-gray-600">
-          <span className="cursor-default hover:text-gray-900 transition-colors">作品をさがす</span>
-          <span className="cursor-default hover:text-gray-900 transition-colors">新着</span>
-          <span className="cursor-default hover:text-gray-900 transition-colors">ランキング</span>
-        </nav>
+        {import.meta.env.DEV && (
+          <nav className="flex items-center gap-6 text-[13px] text-gray-600">
+            <span className="cursor-default hover:text-gray-900 transition-colors">作品をさがす</span>
+            <span className="cursor-default hover:text-gray-900 transition-colors">新着</span>
+            <span className="cursor-default hover:text-gray-900 transition-colors">ランキング</span>
+          </nav>
+        )}
 
         <div className="flex-1" />
       </div>
@@ -118,9 +120,9 @@ export default function PublicStoryPage() {
     <div className="min-h-screen bg-white">
       <SiteHeader />
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="flex gap-8 items-start">
+        <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-start">
           {/* 左列: カバー画像 + 公開日 */}
-          <div className="w-52 shrink-0">
+          <div className="w-48 sm:w-52 shrink-0 mx-auto sm:mx-0">
             <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden mb-4">
               {story.coverImageUrl ? (
                 <img
@@ -189,7 +191,7 @@ export default function PublicStoryPage() {
                 公開中のエピソードはありません
               </div>
             ) : (
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {story.episodes.map((ep) => (
                   <EpisodeCard key={ep.id} episode={ep} onClick={() => setViewingEpisode(ep)} />
                 ))}

@@ -24,10 +24,9 @@ export function useCharacterList(storyId: number) {
   })
 
   const rawList = listQuery.data ?? []
-  const protagonistId = rawList.find((r) => r.isProtagonist)?.id ?? null
-  const protagonist = rawList.find((r) => r.isProtagonist)
-    ? toCharacter(rawList.find((r) => r.isProtagonist)!)
-    : null
+  const protagonistRaw = rawList.find((r) => r.isProtagonist) ?? null
+  const protagonistId = protagonistRaw?.id ?? null
+  const protagonist = protagonistRaw ? toCharacter(protagonistRaw) : null
   const subCharacters = rawList.filter((r) => !r.isProtagonist).map(toCharacter)
 
   useEffect(() => {
