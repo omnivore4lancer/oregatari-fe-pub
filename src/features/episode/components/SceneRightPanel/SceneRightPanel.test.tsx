@@ -13,6 +13,7 @@ const mockPage: EpisodePageData = {
   pageNumber: 1,
   instructions: null,
   imageUrl: null,
+  displayImageUrl: null,
   rows: [
     {
       id: 1,

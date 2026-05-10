@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useContext, useState } from 'react'
+import { createContext, type ReactNode, useCallback, useContext, useState } from 'react'
 
 import { Button } from '../components/ui'
 import { ApiError } from '../lib/apiClient'
@@ -30,7 +30,7 @@ const ApiErrorContext = createContext<ContextValue>({ showError: () => {} })
 export function ApiErrorProvider({ children }: { children: ReactNode }) {
   const [info, setInfo] = useState<ApiErrorInfo | null>(null)
 
-  function showError(e: unknown) {
+  const showError = useCallback((e: unknown) => {
     if (e instanceof DetailedError) {
       setInfo({ status: e.status, message: e.message, detail: e.detail })
     } else if (e instanceof ApiError) {
@@ -40,7 +40,7 @@ export function ApiErrorProvider({ children }: { children: ReactNode }) {
     } else {
       setInfo({ status: 0, message: '不明なエラーが発生しました' })
     }
-  }
+  }, [])
 
   return (
     <ApiErrorContext.Provider value={{ showError }}>

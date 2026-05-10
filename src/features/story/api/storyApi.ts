@@ -87,9 +87,13 @@ export const storyApi = {
           for (const line of part.split('\n')) {
             if (!line.startsWith('data:')) continue
             try {
-              const { text } = JSON.parse(line.slice(5)) as { text: string }
-              if (text) onChunk(text)
-            } catch { /* ignore */ }
+              const ev = JSON.parse(line.slice(5)) as { text?: string; error?: string }
+              if (ev.text) onChunk(ev.text)
+              if (ev.error) throw new ApiError(500, ev.error)
+            } catch (e) {
+              if (e instanceof ApiError) throw e
+              /* ignore other malformed JSON */
+            }
           }
         }
       }

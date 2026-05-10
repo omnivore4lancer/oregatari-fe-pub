@@ -51,10 +51,11 @@ function PageDisplay({ page }: { page: ViewerPage }) {
   if (page.type === 'title') {
     return <TitlePageDisplay episodeNumber={page.episodeNumber} episodeTitle={page.episodeTitle} />
   }
-  if (page.data.imageUrl) {
+  const src = page.data.displayImageUrl ?? page.data.imageUrl
+  if (src) {
     return (
       <img
-        src={page.data.imageUrl}
+        src={src}
         alt={`ページ ${page.data.pageNumber}`}
         className="w-full h-full object-contain"
       />

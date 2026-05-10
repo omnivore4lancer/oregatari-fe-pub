@@ -10,9 +10,10 @@ interface EpisodeCardProps {
   onDelete?: () => void
   onPublish?: () => void
   onUnpublish?: () => void
+  isPublishing?: boolean
 }
 
-export function EpisodeCard({ episode, onEdit, onComicEdit, onDelete, onPublish, onUnpublish }: EpisodeCardProps) {
+export function EpisodeCard({ episode, onEdit, onComicEdit, onDelete, onPublish, onUnpublish, isPublishing = false }: EpisodeCardProps) {
   const isGenerating = episode.generatingState === 'generating'
 
   return (
@@ -33,16 +34,18 @@ export function EpisodeCard({ episode, onEdit, onComicEdit, onDelete, onPublish,
             <Button
               className="shrink-0 !py-1 text-[12px] border-red-300 text-red-600 hover:border-red-400"
               onClick={(e) => { e.stopPropagation(); onUnpublish?.() }}
+              disabled={isPublishing}
             >
-              公開取り下げ
+              {isPublishing ? <SpinnerDots size="sm" /> : '公開取り下げ'}
             </Button>
           ) : (
             <Button
               variant="primary"
               className="shrink-0 !py-1 text-[12px]"
               onClick={(e) => { e.stopPropagation(); onPublish?.() }}
+              disabled={isPublishing}
             >
-              公開する
+              {isPublishing ? <SpinnerDots size="sm" /> : '公開する'}
             </Button>
           )}
         </div>

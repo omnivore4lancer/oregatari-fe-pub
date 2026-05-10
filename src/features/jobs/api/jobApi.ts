@@ -1,7 +1,7 @@
 import { apiClient } from '../../../lib/apiClient'
 
 export type JobStatus = 'RUNNING' | 'DONE' | 'FAILED'
-export type JobType = 'IMAGE_GENERATION' | 'PANEL_LAYOUT' | 'COVER_IMAGE'
+export type JobType = 'IMAGE_GENERATION' | 'PANEL_LAYOUT' | 'COVER_IMAGE' | 'THREE_VIEW'
 
 export type JobListItem = {
   id: string
@@ -30,6 +30,8 @@ export type JobListResponse = {
 }
 
 export const jobApi = {
+  getJob: (jobId: string) =>
+    apiClient.get<{ id: string; status: JobStatus; errorMessage: string | null }>(`/jobs/${jobId}`),
   getJobs: (params?: { page?: number; limit?: number; status?: JobStatus; jobType?: JobType }) => {
     const query = new URLSearchParams()
     if (params?.page) query.set('page', String(params.page))

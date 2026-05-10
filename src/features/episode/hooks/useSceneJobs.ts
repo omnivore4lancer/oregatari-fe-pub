@@ -73,10 +73,20 @@ export function useSceneJobs(
             .filter((j) => j.status === 'running' && j.jobType === 'image_generation' && j.pageNumber !== null)
             .map((j) => j.pageNumber as number),
         )
-        const completedPages = [...generatingPagesRef.current].filter((n) => !runningImageNums.has(n))
+        // done/failed が明示的に返ってきたページのみ完了扱いにする。
+        // 楽観的に generatingPages に追加した直後にポーリングが動いて DB にジョブがまだ存在しない場合、
+        // running に含まれないだけで done/failed でもないため誤判定を防げる。
+        const doneOrFailedImageNums = new Set(
+          activeJobs
+            .filter((j) => (j.status === 'done' || j.status === 'failed') && j.jobType === 'image_generation' && j.pageNumber !== null)
+            .map((j) => j.pageNumber as number),
+        )
+        const completedPages = [...generatingPagesRef.current].filter(
+          (n) => !runningImageNums.has(n) && doneOrFailedImageNums.has(n),
+        )
         if (completedPages.length > 0) {
           const failedImageJobs = activeJobs.filter(
-            (j) => j.status === 'failed' && j.jobType === 'image_generation',
+            (j) => j.status === 'failed' && j.jobType === 'image_generation' && j.pageNumber !== null && generatingPagesRef.current.has(j.pageNumber!),
           )
           for (const job of failedImageJobs) {
             showError(toDetailedError(job.errorMessage ?? '画像生成に失敗しました', '画像生成に失敗しました'))

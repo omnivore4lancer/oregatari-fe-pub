@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDownIcon } from '../../../../components/Icons'
+import { ChevronDownIcon, TrashIcon } from '../../../../components/Icons'
 import { OptionalBadge, inputClass, textareaClass, ToggleButton } from '../../../../components/ui'
 import type { CharacterDraft } from '../../types'
 import { GENDER_OPTIONS } from '../../utils'
@@ -18,27 +18,32 @@ export function CharacterDraftCard({ index, char, onChange, onRemove, simplified
 
   return (
     <div className="border-b border-[var(--border)]">
-      <div className="bg-[var(--bg)] flex items-center px-4 py-2 border-b border-[var(--border)]">
+      <div className="bg-[var(--bg)] flex items-center px-4 py-3 border-b border-[var(--border)] hover:bg-gray-50 transition-colors">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1.5 flex-1 text-left bg-transparent border-none cursor-pointer"
+          className="flex items-center gap-2.5 flex-1 text-left bg-transparent border-none cursor-pointer"
         >
           <span
-            style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.15s', display: 'inline-flex' }}
+            style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s', display: 'inline-flex' }}
+            className="text-gray-400"
           >
-            <ChevronDownIcon size={11} />
+            <ChevronDownIcon size={15} />
           </span>
-          <span className="text-[12px] font-semibold text-[var(--text-h)]">登場人物 {index + 1}</span>
+          <span className="w-5 h-5 rounded-full bg-purple-100 text-purple-600 text-[11px] font-bold flex items-center justify-center shrink-0">
+            {index + 1}
+          </span>
+          <span className="text-[13px] font-semibold text-[var(--text-h)]">登場人物 {index + 1}</span>
           {!open && char.name && (
-            <span className="text-[11px] text-[var(--text)] ml-1">{char.name}</span>
+            <span className="text-[12px] text-[var(--text)] ml-1 truncate">— {char.name}</span>
           )}
         </button>
         <button
           type="button"
           onClick={onRemove}
-          className="text-[11px] text-[var(--text)] hover:text-red-500 transition-colors shrink-0"
+          className="flex items-center gap-1 text-[12px] text-gray-400 hover:text-red-500 transition-colors shrink-0 px-2 py-1 rounded hover:bg-red-50"
         >
+          <TrashIcon size={12} />
           削除
         </button>
       </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -8,6 +8,7 @@ import { useApiError } from '../../contexts/ApiErrorContext'
 import { useToast } from '../../contexts/ToastContext'
 import { DesignSection, InfoGrid } from '../../features/character'
 import { characterApi, toCharacterDetail } from '../../features/character'
+import { jobApi, useJobPolling } from '../../features/jobs'
 import { queryKeys } from '../../lib/queryKeys'
 import { useQueryWithError } from '../../lib/useQueryWithError'
 
@@ -21,7 +22,42 @@ export default function CharacterEditPage() {
   const queryClient = useQueryClient()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [isGenerating, setIsGenerating] = useState(false)
+
+  const threeViewJobIdRef = useRef<string | null>(null)
+  const imageUrlBeforeRef = useRef<string | null>(null)
+  const { isPolling: isGenerating, start: startThreeViewPolling } = useJobPolling<{
+    id: string; status: 'RUNNING' | 'DONE' | 'FAILED'; errorMessage: string | null
+  }>({
+    poll: () => jobApi.getJob(threeViewJobIdRef.current!),
+    isDone: (job) => job.status === 'DONE' || job.status === 'FAILED',
+    onDone: async (job) => {
+      localStorage.removeItem(`three-view-job-${characterId}`)
+      if (job.status === 'FAILED') {
+        showError(new Error(job.errorMessage ?? '三面図の生成に失敗しました'))
+        return
+      }
+      // imageUrl が実際に更新されたか検証
+      const updated = await characterApi.getCharacter(storyId, characterId)
+      if (!updated.imageUrl || updated.imageUrl === imageUrlBeforeRef.current) {
+        showError(new Error('三面図の生成に失敗しました。時間をおいて再試行してください。'))
+        return
+      }
+      await queryClient.invalidateQueries({ queryKey: queryKeys.character(storyId, characterId) })
+      showToast('三面図を生成しました')
+    },
+    onError: (e) => {
+      localStorage.removeItem(`three-view-job-${characterId}`)
+      showError(e)
+    },
+  })
+
+  // マウント時に実行中ジョブを復元
+  useEffect(() => {
+    const savedJobId = localStorage.getItem(`three-view-job-${characterId}`)
+    if (!savedJobId) return
+    threeViewJobIdRef.current = savedJobId
+    startThreeViewPolling()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: character } = useQueryWithError({
     queryKey: queryKeys.character(storyId, characterId),
@@ -42,15 +78,14 @@ export default function CharacterEditPage() {
   }
 
   async function handleGenerateThreeView() {
-    setIsGenerating(true)
     try {
-      await characterApi.generateThreeView(storyId, characterId)
-      await queryClient.invalidateQueries({ queryKey: queryKeys.character(storyId, characterId) })
-      showToast('三面図を生成しました')
+      imageUrlBeforeRef.current = character?.imageUrl ?? null
+      const { jobId } = await characterApi.generateThreeView(storyId, characterId)
+      localStorage.setItem(`three-view-job-${characterId}`, jobId)
+      threeViewJobIdRef.current = jobId
+      startThreeViewPolling()
     } catch (e) {
       showError(e)
-    } finally {
-      setIsGenerating(false)
     }
   }
 

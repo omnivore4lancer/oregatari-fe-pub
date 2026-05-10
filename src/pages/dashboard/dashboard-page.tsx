@@ -1,13 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 
-import { PlusIcon } from '../../components/Icons'
 import { ConfirmDialog, SpinnerDots } from '../../components/ui'
 import { useApiError } from '../../contexts/ApiErrorContext'
 import { useToast } from '../../contexts/ToastContext'
 import type { StoryItem } from '../../features/dashboard'
-import { StoryCard } from '../../features/dashboard'
+import { NewStoryCard, StoryCard } from '../../features/dashboard'
 import { storyApi } from '../../features/story'
 import { queryKeys } from '../../lib/queryKeys'
 import { useQueryWithError } from '../../lib/useQueryWithError'
@@ -58,17 +56,10 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-5 py-2.5 border-b border-gray-200">
+      <div className="flex items-center px-5 py-2.5 border-b border-gray-200">
         <button className="px-3.5 py-1.5 rounded-md text-[13px] bg-gray-100 text-gray-800 font-semibold border-none cursor-default">
           漫画
         </button>
-        <Link
-          to="/stories/new"
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-purple-600 text-white text-[13px] font-semibold no-underline hover:bg-purple-700 transition-colors"
-        >
-          <PlusIcon size={14} />
-          新しい作品を登録
-        </Link>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-5">
@@ -79,15 +70,12 @@ export default function DashboardPage() {
         ) : (
           <>
             <h2 className="text-[18px] font-bold text-gray-800 mb-4 m-0">今日</h2>
-            {stories.length === 0 ? (
-              <p className="text-[14px] text-gray-400">物語がありません。新しいワークスペースを作成してください。</p>
-            ) : (
-              <div className="flex flex-wrap gap-5">
-                {stories.map((story) => (
-                  <StoryCard key={story.id} story={story} onDelete={setDeleteTarget} />
-                ))}
-              </div>
-            )}
+            <div className="flex flex-wrap gap-5">
+              {stories.map((story) => (
+                <StoryCard key={story.id} story={story} onDelete={setDeleteTarget} />
+              ))}
+              <NewStoryCard />
+            </div>
           </>
         )}
       </div>

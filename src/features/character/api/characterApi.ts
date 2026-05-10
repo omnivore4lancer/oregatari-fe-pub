@@ -1,4 +1,4 @@
-import { ApiError, apiClient } from '../../../lib/apiClient'
+import { apiClient } from '../../../lib/apiClient'
 import type { ArchetypeRole, Character, CharacterDetail } from '../types'
 
 export interface CharacterResponse {
@@ -96,20 +96,6 @@ export const characterApi = {
     apiClient.put<CharacterResponse>(`/stories/${storyId}/characters/${charId}`, data),
   deleteCharacter: (storyId: number, charId: number) =>
     apiClient.delete<{ message: string }>(`/stories/${storyId}/characters/${charId}`),
-  generateThreeView: async (storyId: number, charId: number): Promise<void> => {
-    const res = await apiClient.stream(`/stories/${storyId}/characters/${charId}/generate-three-view`, { method: 'POST' })
-    if (!res.ok) throw new ApiError(res.status, `三面図の生成に失敗しました (${res.status})`)
-    if (!res.body) return
-    const reader = res.body.getReader()
-    const decoder = new TextDecoder()
-    try {
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        if (decoder.decode(value, { stream: true }).includes('"done":true')) break
-      }
-    } finally {
-      reader.releaseLock()
-    }
-  },
+  generateThreeView: (storyId: number, charId: number) =>
+    apiClient.post<{ jobId: string }>(`/stories/${storyId}/characters/${charId}/generate-three-view`, {}),
 }

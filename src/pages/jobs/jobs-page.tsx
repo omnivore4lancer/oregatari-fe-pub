@@ -11,6 +11,7 @@ const JOB_TYPE_LABEL: Record<JobType, string> = {
   IMAGE_GENERATION: '画像生成',
   PANEL_LAYOUT: 'コマ割り',
   COVER_IMAGE: '表紙画像',
+  THREE_VIEW: '三面図',
 }
 
 const STATUS_LABEL: Record<JobStatus, string> = {
@@ -84,6 +85,7 @@ export default function JobsPage() {
           <option value="IMAGE_GENERATION">画像生成</option>
           <option value="PANEL_LAYOUT">コマ割り</option>
           <option value="COVER_IMAGE">表紙画像</option>
+          <option value="THREE_VIEW">三面図</option>
         </select>
       </div>
 

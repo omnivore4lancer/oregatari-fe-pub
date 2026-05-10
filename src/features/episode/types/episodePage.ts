@@ -47,5 +47,6 @@ export interface EpisodePageData {
   pageNumber: number
   instructions: string | null
   imageUrl: string | null
+  displayImageUrl: string | null
   rows: EpisodePageRowData[]
 }

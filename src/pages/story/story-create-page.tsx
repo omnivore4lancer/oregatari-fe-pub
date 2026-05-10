@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom'
 
 import {
   Button,
-  DashedAddButton,
   inputClass,
   OptionalBadge,
   RequiredBadge,
   textareaClass,
   ToggleButton,
 } from '../../components/ui'
+import { PlusIcon } from '../../components/Icons'
 import { useApiError } from '../../contexts/ApiErrorContext'
 import { useToast } from '../../contexts/ToastContext'
 import {
@@ -144,7 +144,7 @@ export default function StoryCreatePage() {
         })
       }
       showToast('物語を作成しました')
-      navigate(`/stories/${story.id}`)
+      navigate(`/stories/${story.id}/story`, { state: { autoGenerate: true } })
     } catch (e) {
       showError(e)
     } finally {
@@ -171,7 +171,7 @@ export default function StoryCreatePage() {
                         ? 'bg-[var(--accent)] border-[var(--accent)] text-white'
                         : active
                           ? 'bg-transparent border-[var(--accent)] text-[var(--accent)]'
-                          : 'bg-transparent border-[var(--border)] text-[var(--text)]'
+                          : 'bg-transparent border-black text-[var(--text)]'
                     }`}
                   >
                     {done ? '✓' : i + 1}
@@ -187,7 +187,7 @@ export default function StoryCreatePage() {
                 {i < STEPS.length - 1 && (
                   <div
                     className={`flex-1 h-px mx-2 mb-4 transition-colors ${
-                      done ? 'bg-[var(--accent)]' : 'bg-[var(--border)]'
+                      done ? 'bg-[var(--accent)]' : 'bg-black'
                     }`}
                   />
                 )}
@@ -332,11 +332,14 @@ export default function StoryCreatePage() {
                 onChange={(field, value) => updateCharacterField(idx, field, value)}
                 onRemove={() => removeCharacter(idx)}
                 simplified
-                defaultOpen={idx === 0}
+                defaultOpen={idx === characters.length - 1}
               />
             ))}
             <div className="px-4 py-3 bg-[var(--bg)]">
-              <DashedAddButton label="登場人物を追加" onClick={addCharacter} />
+              <Button variant="primary" className="flex items-center gap-1.5" onClick={addCharacter}>
+                <PlusIcon size={14} />
+                登場人物を追加
+              </Button>
             </div>
           </div>
         </>

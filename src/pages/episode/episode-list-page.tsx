@@ -30,6 +30,7 @@ export default function EpisodeListPage() {
   const [selectedEpisodeId, setSelectedEpisodeId] = useState<number | null>(null)
   const [deletingEpisode, setDeletingEpisode] = useState<Episode | null>(null)
   const [publishTarget, setPublishTarget] = useState<{ episode: Episode; action: 'publish' | 'unpublish' } | null>(null)
+  const [publishingId, setPublishingId] = useState<number | null>(null)
   const [polling, setPolling] = useState(
     () => !!(location.state as { backgroundGenerating?: boolean } | null)?.backgroundGenerating,
   )
@@ -89,6 +90,8 @@ export default function EpisodeListPage() {
   async function handlePublishConfirm() {
     if (!publishTarget) return
     const { episode, action } = publishTarget
+    setPublishTarget(null)
+    setPublishingId(episode.id)
     try {
       await (action === 'publish'
         ? episodeApi.publishEpisode(storyId, episode.id)
@@ -109,7 +112,7 @@ export default function EpisodeListPage() {
     } catch (e) {
       showError(e)
     } finally {
-      setPublishTarget(null)
+      setPublishingId(null)
     }
   }
 
@@ -177,6 +180,7 @@ export default function EpisodeListPage() {
                     onDelete={() => setDeletingEpisode(ep)}
                     onPublish={() => setPublishTarget({ episode: ep, action: 'publish' })}
                     onUnpublish={() => setPublishTarget({ episode: ep, action: 'unpublish' })}
+                    isPublishing={publishingId === ep.id}
                   />
                 </button>
               ))
