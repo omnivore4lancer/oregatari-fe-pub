@@ -1,0 +1,5933 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Oregatari API"
+  },
+  "components": {
+    "schemas": {},
+    "parameters": {}
+  },
+  "paths": {
+    "/public/stories/{storyId}": {
+      "get": {
+        "tags": [
+          "Public"
+        ],
+        "summary": "公開ストーリーを取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "公開ストーリー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/public/episodes/{episodeId}/pages": {
+      "get": {
+        "tags": [
+          "Public"
+        ],
+        "summary": "公開エピソードのページ一覧を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ページ一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/users/sync": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "認証ユーザーを DB に同期する",
+        "responses": {
+          "200": {
+            "description": "同期済みユーザー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "uid": {
+                      "type": "string",
+                      "example": "abc123"
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "user@example.com"
+                    },
+                    "name": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": "山田太郎"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2024-01-01T00:00:00.000Z"
+                    }
+                  },
+                  "required": [
+                    "user_id",
+                    "uid",
+                    "email",
+                    "name",
+                    "createdAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "バリデーションエラー"
+          }
+        }
+      }
+    },
+    "/genres": {
+      "get": {
+        "tags": [
+          "Genres"
+        ],
+        "summary": "ジャンル一覧を取得する",
+        "responses": {
+          "200": {
+            "description": "ジャンルの一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "ファンタジー"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories": {
+      "get": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "ストーリー一覧を取得する",
+        "responses": {
+          "200": {
+            "description": "ストーリー一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "userId": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "剣と魔法の物語"
+                      },
+                      "worldSetting": {
+                        "type": "string"
+                      },
+                      "era": {
+                        "type": "string",
+                        "enum": [
+                          "MODERN",
+                          "MEDIEVAL",
+                          "FUTURE"
+                        ]
+                      },
+                      "additionalElements": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "eraBg": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "intro": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "dev": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "climax": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "conclusion": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "genres": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "example": 1
+                            },
+                            "name": {
+                              "type": "string",
+                              "example": "ファンタジー"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name"
+                          ]
+                        }
+                      },
+                      "coverImageUrl": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "previewImages": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "userId",
+                      "name",
+                      "worldSetting",
+                      "era",
+                      "additionalElements",
+                      "eraBg",
+                      "intro",
+                      "dev",
+                      "climax",
+                      "conclusion",
+                      "genres",
+                      "coverImageUrl",
+                      "createdAt",
+                      "updatedAt",
+                      "previewImages"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "ストーリーを作成する",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "genreIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "minItems": 1,
+                    "maxItems": 3
+                  },
+                  "worldSetting": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "era": {
+                    "type": "string",
+                    "enum": [
+                      "MODERN",
+                      "MEDIEVAL",
+                      "FUTURE"
+                    ]
+                  },
+                  "additionalElements": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "genreIds",
+                  "worldSetting",
+                  "era"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "作成済みストーリー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{id}": {
+      "get": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "ストーリーを取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ストーリー詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "userId": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "剣と魔法の物語"
+                    },
+                    "worldSetting": {
+                      "type": "string"
+                    },
+                    "era": {
+                      "type": "string",
+                      "enum": [
+                        "MODERN",
+                        "MEDIEVAL",
+                        "FUTURE"
+                      ]
+                    },
+                    "additionalElements": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "eraBg": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "intro": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "dev": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "climax": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "conclusion": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "genres": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "ファンタジー"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ]
+                      }
+                    },
+                    "coverImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "characters": {
+                      "type": "array",
+                      "items": {
+                        "nullable": true
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "userId",
+                    "name",
+                    "worldSetting",
+                    "era",
+                    "additionalElements",
+                    "eraBg",
+                    "intro",
+                    "dev",
+                    "climax",
+                    "conclusion",
+                    "genres",
+                    "coverImageUrl",
+                    "createdAt",
+                    "updatedAt",
+                    "characters"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "ストーリーを更新する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "genreIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "minItems": 1,
+                    "maxItems": 3
+                  },
+                  "worldSetting": {
+                    "type": "string"
+                  },
+                  "era": {
+                    "type": "string",
+                    "enum": [
+                      "MODERN",
+                      "MEDIEVAL",
+                      "FUTURE"
+                    ]
+                  },
+                  "additionalElements": {
+                    "type": "string"
+                  },
+                  "eraBg": {
+                    "type": "string"
+                  },
+                  "intro": {
+                    "type": "string"
+                  },
+                  "dev": {
+                    "type": "string"
+                  },
+                  "climax": {
+                    "type": "string"
+                  },
+                  "conclusion": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新済みストーリー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "ストーリーを削除する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "削除完了",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{id}/generate": {
+      "post": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "ストーリー生成（SSE）",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Server-Sent Events ストリーム",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/characters": {
+      "get": {
+        "tags": [
+          "Characters"
+        ],
+        "summary": "キャラクター一覧を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "キャラクター一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "storyId": {
+                        "type": "integer"
+                      },
+                      "isProtagonist": {
+                        "type": "boolean"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "主人公"
+                      },
+                      "role": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "archetypeRole": {
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                          "MENTOR",
+                          "SHADOW",
+                          "HERALD",
+                          "SHAPESHIFTER",
+                          null
+                        ]
+                      },
+                      "age": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "gender": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "overview": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "appearance": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "personality": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "motivation": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "background": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "skills": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "avatarColor": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "imageUrl": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "faceImageUrl": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "imagePrompt": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "storyId",
+                      "isProtagonist",
+                      "name",
+                      "role",
+                      "archetypeRole",
+                      "age",
+                      "gender",
+                      "overview",
+                      "appearance",
+                      "personality",
+                      "motivation",
+                      "background",
+                      "skills",
+                      "avatarColor",
+                      "imageUrl",
+                      "faceImageUrl",
+                      "imagePrompt",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Characters"
+        ],
+        "summary": "キャラクターを作成する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "isProtagonist": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "archetypeRole": {
+                    "type": "string",
+                    "enum": [
+                      "MENTOR",
+                      "SHADOW",
+                      "HERALD",
+                      "SHAPESHIFTER"
+                    ]
+                  },
+                  "age": {
+                    "type": "string"
+                  },
+                  "gender": {
+                    "type": "string"
+                  },
+                  "overview": {
+                    "type": "string"
+                  },
+                  "appearance": {
+                    "type": "string"
+                  },
+                  "personality": {
+                    "type": "string"
+                  },
+                  "motivation": {
+                    "type": "string"
+                  },
+                  "background": {
+                    "type": "string"
+                  },
+                  "skills": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": []
+                  },
+                  "avatarColor": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "作成済みキャラクター",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "isProtagonist": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "主人公"
+                    },
+                    "role": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "archetypeRole": {
+                      "type": "string",
+                      "nullable": true,
+                      "enum": [
+                        "MENTOR",
+                        "SHADOW",
+                        "HERALD",
+                        "SHAPESHIFTER",
+                        null
+                      ]
+                    },
+                    "age": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "gender": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "overview": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "appearance": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "personality": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "motivation": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "background": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "skills": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "avatarColor": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "imageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "faceImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "imagePrompt": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "isProtagonist",
+                    "name",
+                    "role",
+                    "archetypeRole",
+                    "age",
+                    "gender",
+                    "overview",
+                    "appearance",
+                    "personality",
+                    "motivation",
+                    "background",
+                    "skills",
+                    "avatarColor",
+                    "imageUrl",
+                    "faceImageUrl",
+                    "imagePrompt",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/characters/{charId}": {
+      "get": {
+        "tags": [
+          "Characters"
+        ],
+        "summary": "キャラクターを取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "charId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "キャラクター詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "isProtagonist": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "主人公"
+                    },
+                    "role": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "archetypeRole": {
+                      "type": "string",
+                      "nullable": true,
+                      "enum": [
+                        "MENTOR",
+                        "SHADOW",
+                        "HERALD",
+                        "SHAPESHIFTER",
+                        null
+                      ]
+                    },
+                    "age": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "gender": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "overview": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "appearance": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "personality": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "motivation": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "background": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "skills": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "avatarColor": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "imageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "faceImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "imagePrompt": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "isProtagonist",
+                    "name",
+                    "role",
+                    "archetypeRole",
+                    "age",
+                    "gender",
+                    "overview",
+                    "appearance",
+                    "personality",
+                    "motivation",
+                    "background",
+                    "skills",
+                    "avatarColor",
+                    "imageUrl",
+                    "faceImageUrl",
+                    "imagePrompt",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Characters"
+        ],
+        "summary": "キャラクターを更新する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "charId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "archetypeRole": {
+                    "type": "string",
+                    "enum": [
+                      "MENTOR",
+                      "SHADOW",
+                      "HERALD",
+                      "SHAPESHIFTER"
+                    ]
+                  },
+                  "age": {
+                    "type": "string"
+                  },
+                  "gender": {
+                    "type": "string"
+                  },
+                  "overview": {
+                    "type": "string"
+                  },
+                  "appearance": {
+                    "type": "string"
+                  },
+                  "personality": {
+                    "type": "string"
+                  },
+                  "motivation": {
+                    "type": "string"
+                  },
+                  "background": {
+                    "type": "string"
+                  },
+                  "skills": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "avatarColor": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新済みキャラクター",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "isProtagonist": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "主人公"
+                    },
+                    "role": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "archetypeRole": {
+                      "type": "string",
+                      "nullable": true,
+                      "enum": [
+                        "MENTOR",
+                        "SHADOW",
+                        "HERALD",
+                        "SHAPESHIFTER",
+                        null
+                      ]
+                    },
+                    "age": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "gender": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "overview": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "appearance": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "personality": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "motivation": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "background": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "skills": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "avatarColor": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "imageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "faceImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "imagePrompt": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "isProtagonist",
+                    "name",
+                    "role",
+                    "archetypeRole",
+                    "age",
+                    "gender",
+                    "overview",
+                    "appearance",
+                    "personality",
+                    "motivation",
+                    "background",
+                    "skills",
+                    "avatarColor",
+                    "imageUrl",
+                    "faceImageUrl",
+                    "imagePrompt",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Characters"
+        ],
+        "summary": "キャラクターを削除する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "charId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "削除完了",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/characters/{charId}/generate-three-view": {
+      "post": {
+        "tags": [
+          "Characters"
+        ],
+        "summary": "キャラクター三面図を生成する（SSE）",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "charId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Server-Sent Events ストリーム",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/generate/stream": {
+      "post": {
+        "tags": [
+          "Episodes"
+        ],
+        "summary": "エピソードを生成する（SSE）",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "relation": {
+                    "type": "string",
+                    "enum": [
+                      "STANDALONE",
+                      "SEQUEL"
+                    ],
+                    "default": "STANDALONE"
+                  },
+                  "parentId": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "characterIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "default": []
+                  },
+                  "inheritRelation": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "titleHint": {
+                    "type": "string"
+                  },
+                  "summaryHint": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Server-Sent Events ストリーム",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/generate/background": {
+      "post": {
+        "tags": [
+          "Episodes"
+        ],
+        "summary": "エピソードをバックグラウンド生成する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "relation": {
+                    "type": "string",
+                    "enum": [
+                      "STANDALONE",
+                      "SEQUEL"
+                    ],
+                    "default": "STANDALONE"
+                  },
+                  "parentId": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "characterIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "default": []
+                  },
+                  "inheritRelation": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "titleHint": {
+                    "type": "string"
+                  },
+                  "summaryHint": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "ジョブ受付",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes": {
+      "get": {
+        "tags": [
+          "Episodes"
+        ],
+        "summary": "エピソード一覧を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "relation",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "エピソード一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "storyId": {
+                        "type": "integer"
+                      },
+                      "number": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "title": {
+                        "type": "string",
+                        "example": "第一話"
+                      },
+                      "description": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "content": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "UNPUBLISHED",
+                          "PUBLISHED"
+                        ]
+                      },
+                      "relation": {
+                        "type": "string",
+                        "enum": [
+                          "SEQUEL",
+                          "PARALLEL",
+                          "STANDALONE"
+                        ]
+                      },
+                      "generatingState": {
+                        "type": "string",
+                        "enum": [
+                          "GENERATING",
+                          "DONE"
+                        ]
+                      },
+                      "parentId": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "inheritRelation": {
+                        "type": "boolean"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "storyId",
+                      "number",
+                      "title",
+                      "description",
+                      "content",
+                      "status",
+                      "relation",
+                      "generatingState",
+                      "parentId",
+                      "inheritRelation",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Episodes"
+        ],
+        "summary": "エピソードを作成する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "number": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "UNPUBLISHED",
+                      "PUBLISHED"
+                    ],
+                    "default": "UNPUBLISHED"
+                  },
+                  "relation": {
+                    "type": "string",
+                    "enum": [
+                      "SEQUEL",
+                      "PARALLEL",
+                      "STANDALONE"
+                    ],
+                    "default": "STANDALONE"
+                  },
+                  "generatingState": {
+                    "type": "string",
+                    "enum": [
+                      "GENERATING",
+                      "DONE"
+                    ],
+                    "default": "DONE"
+                  },
+                  "parentId": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "characters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "characterId": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true
+                        },
+                        "importance": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "default": 50
+                        }
+                      },
+                      "required": [
+                        "characterId"
+                      ]
+                    },
+                    "default": []
+                  },
+                  "inheritRelation": {
+                    "type": "boolean",
+                    "default": true
+                  }
+                },
+                "required": [
+                  "number",
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "作成済みエピソード",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "number": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "第一話"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "UNPUBLISHED",
+                        "PUBLISHED"
+                      ]
+                    },
+                    "relation": {
+                      "type": "string",
+                      "enum": [
+                        "SEQUEL",
+                        "PARALLEL",
+                        "STANDALONE"
+                      ]
+                    },
+                    "generatingState": {
+                      "type": "string",
+                      "enum": [
+                        "GENERATING",
+                        "DONE"
+                      ]
+                    },
+                    "parentId": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "inheritRelation": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "number",
+                    "title",
+                    "description",
+                    "content",
+                    "status",
+                    "relation",
+                    "generatingState",
+                    "parentId",
+                    "inheritRelation",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}": {
+      "get": {
+        "tags": [
+          "Episodes"
+        ],
+        "summary": "エピソードを取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "エピソード詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "number": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "第一話"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "UNPUBLISHED",
+                        "PUBLISHED"
+                      ]
+                    },
+                    "relation": {
+                      "type": "string",
+                      "enum": [
+                        "SEQUEL",
+                        "PARALLEL",
+                        "STANDALONE"
+                      ]
+                    },
+                    "generatingState": {
+                      "type": "string",
+                      "enum": [
+                        "GENERATING",
+                        "DONE"
+                      ]
+                    },
+                    "parentId": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "inheritRelation": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "number",
+                    "title",
+                    "description",
+                    "content",
+                    "status",
+                    "relation",
+                    "generatingState",
+                    "parentId",
+                    "inheritRelation",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Episodes"
+        ],
+        "summary": "エピソードを更新する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "number": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "UNPUBLISHED",
+                      "PUBLISHED"
+                    ]
+                  },
+                  "relation": {
+                    "type": "string",
+                    "enum": [
+                      "SEQUEL",
+                      "PARALLEL",
+                      "STANDALONE"
+                    ]
+                  },
+                  "generatingState": {
+                    "type": "string",
+                    "enum": [
+                      "GENERATING",
+                      "DONE"
+                    ]
+                  },
+                  "parentId": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "characters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "characterId": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true
+                        },
+                        "importance": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "default": 50
+                        }
+                      },
+                      "required": [
+                        "characterId"
+                      ]
+                    }
+                  },
+                  "inheritRelation": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新済みエピソード",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "number": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "第一話"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "UNPUBLISHED",
+                        "PUBLISHED"
+                      ]
+                    },
+                    "relation": {
+                      "type": "string",
+                      "enum": [
+                        "SEQUEL",
+                        "PARALLEL",
+                        "STANDALONE"
+                      ]
+                    },
+                    "generatingState": {
+                      "type": "string",
+                      "enum": [
+                        "GENERATING",
+                        "DONE"
+                      ]
+                    },
+                    "parentId": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "inheritRelation": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "number",
+                    "title",
+                    "description",
+                    "content",
+                    "status",
+                    "relation",
+                    "generatingState",
+                    "parentId",
+                    "inheritRelation",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Episodes"
+        ],
+        "summary": "エピソードを削除する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "削除完了",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}/publish": {
+      "post": {
+        "tags": [
+          "Episodes"
+        ],
+        "summary": "エピソードを公開する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "公開済みエピソード",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "number": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "第一話"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "UNPUBLISHED",
+                        "PUBLISHED"
+                      ]
+                    },
+                    "relation": {
+                      "type": "string",
+                      "enum": [
+                        "SEQUEL",
+                        "PARALLEL",
+                        "STANDALONE"
+                      ]
+                    },
+                    "generatingState": {
+                      "type": "string",
+                      "enum": [
+                        "GENERATING",
+                        "DONE"
+                      ]
+                    },
+                    "parentId": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "inheritRelation": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "number",
+                    "title",
+                    "description",
+                    "content",
+                    "status",
+                    "relation",
+                    "generatingState",
+                    "parentId",
+                    "inheritRelation",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}/unpublish": {
+      "post": {
+        "tags": [
+          "Episodes"
+        ],
+        "summary": "エピソードを非公開にする",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "非公開済みエピソード",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "number": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "第一話"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "UNPUBLISHED",
+                        "PUBLISHED"
+                      ]
+                    },
+                    "relation": {
+                      "type": "string",
+                      "enum": [
+                        "SEQUEL",
+                        "PARALLEL",
+                        "STANDALONE"
+                      ]
+                    },
+                    "generatingState": {
+                      "type": "string",
+                      "enum": [
+                        "GENERATING",
+                        "DONE"
+                      ]
+                    },
+                    "parentId": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "inheritRelation": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "number",
+                    "title",
+                    "description",
+                    "content",
+                    "status",
+                    "relation",
+                    "generatingState",
+                    "parentId",
+                    "inheritRelation",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/material-groups": {
+      "get": {
+        "tags": [
+          "MaterialGroups"
+        ],
+        "summary": "素材グループ一覧を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "素材グループ一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "storyId": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "背景素材"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "storyId",
+                      "name",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "MaterialGroups"
+        ],
+        "summary": "素材グループを作成する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "作成済みグループ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "背景素材"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "name",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/material-groups/{groupId}": {
+      "delete": {
+        "tags": [
+          "MaterialGroups"
+        ],
+        "summary": "素材グループを削除する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "groupId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "削除完了",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/materials": {
+      "get": {
+        "tags": [
+          "Materials"
+        ],
+        "summary": "素材一覧を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": false,
+            "name": "groupId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "required": false,
+            "name": "sort",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "素材一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "storyId": {
+                        "type": "integer"
+                      },
+                      "groupId": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "森の背景"
+                      },
+                      "description": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "aspectRatio": {
+                        "type": "string"
+                      },
+                      "artStyle": {
+                        "type": "string"
+                      },
+                      "locationMain": {
+                        "type": "string"
+                      },
+                      "locationDetail": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "worldSetting": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "timeSlot": {
+                        "type": "string"
+                      },
+                      "weather": {
+                        "type": "string"
+                      },
+                      "skyDesc": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "lighting": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "fgLStructure": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "fgLTexture": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "fgLFurniture": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "fgLProps": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "mgCGround": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "mgCDecoration": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "mgCAtmosphere": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "mgRStructure": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "mgRItems": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "bgBuilding": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "bgTerrain": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "imageUrl": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "storyId",
+                      "groupId",
+                      "name",
+                      "description",
+                      "aspectRatio",
+                      "artStyle",
+                      "locationMain",
+                      "locationDetail",
+                      "worldSetting",
+                      "timeSlot",
+                      "weather",
+                      "skyDesc",
+                      "lighting",
+                      "fgLStructure",
+                      "fgLTexture",
+                      "fgLFurniture",
+                      "fgLProps",
+                      "mgCGround",
+                      "mgCDecoration",
+                      "mgCAtmosphere",
+                      "mgRStructure",
+                      "mgRItems",
+                      "bgBuilding",
+                      "bgTerrain",
+                      "imageUrl",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Materials"
+        ],
+        "summary": "素材を作成する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "groupId": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "aspectRatio": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "artStyle": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "locationMain": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "locationDetail": {
+                    "type": "string"
+                  },
+                  "worldSetting": {
+                    "type": "string"
+                  },
+                  "timeSlot": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "weather": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "skyDesc": {
+                    "type": "string"
+                  },
+                  "lighting": {
+                    "type": "string"
+                  },
+                  "fgLStructure": {
+                    "type": "string"
+                  },
+                  "fgLTexture": {
+                    "type": "string"
+                  },
+                  "fgLFurniture": {
+                    "type": "string"
+                  },
+                  "fgLProps": {
+                    "type": "string"
+                  },
+                  "mgCGround": {
+                    "type": "string"
+                  },
+                  "mgCDecoration": {
+                    "type": "string"
+                  },
+                  "mgCAtmosphere": {
+                    "type": "string"
+                  },
+                  "mgRStructure": {
+                    "type": "string"
+                  },
+                  "mgRItems": {
+                    "type": "string"
+                  },
+                  "bgBuilding": {
+                    "type": "string"
+                  },
+                  "bgTerrain": {
+                    "type": "string"
+                  },
+                  "imageUrl": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "groupId",
+                  "name",
+                  "aspectRatio",
+                  "artStyle",
+                  "locationMain",
+                  "timeSlot",
+                  "weather"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "作成済み素材",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "groupId": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "森の背景"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "aspectRatio": {
+                      "type": "string"
+                    },
+                    "artStyle": {
+                      "type": "string"
+                    },
+                    "locationMain": {
+                      "type": "string"
+                    },
+                    "locationDetail": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "worldSetting": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "timeSlot": {
+                      "type": "string"
+                    },
+                    "weather": {
+                      "type": "string"
+                    },
+                    "skyDesc": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "lighting": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLStructure": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLTexture": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLFurniture": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLProps": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgCGround": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgCDecoration": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgCAtmosphere": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgRStructure": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgRItems": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bgBuilding": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bgTerrain": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "imageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "groupId",
+                    "name",
+                    "description",
+                    "aspectRatio",
+                    "artStyle",
+                    "locationMain",
+                    "locationDetail",
+                    "worldSetting",
+                    "timeSlot",
+                    "weather",
+                    "skyDesc",
+                    "lighting",
+                    "fgLStructure",
+                    "fgLTexture",
+                    "fgLFurniture",
+                    "fgLProps",
+                    "mgCGround",
+                    "mgCDecoration",
+                    "mgCAtmosphere",
+                    "mgRStructure",
+                    "mgRItems",
+                    "bgBuilding",
+                    "bgTerrain",
+                    "imageUrl",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/materials/{materialId}": {
+      "get": {
+        "tags": [
+          "Materials"
+        ],
+        "summary": "素材を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "materialId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "素材詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "groupId": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "森の背景"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "aspectRatio": {
+                      "type": "string"
+                    },
+                    "artStyle": {
+                      "type": "string"
+                    },
+                    "locationMain": {
+                      "type": "string"
+                    },
+                    "locationDetail": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "worldSetting": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "timeSlot": {
+                      "type": "string"
+                    },
+                    "weather": {
+                      "type": "string"
+                    },
+                    "skyDesc": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "lighting": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLStructure": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLTexture": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLFurniture": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLProps": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgCGround": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgCDecoration": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgCAtmosphere": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgRStructure": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgRItems": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bgBuilding": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bgTerrain": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "imageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "groupId",
+                    "name",
+                    "description",
+                    "aspectRatio",
+                    "artStyle",
+                    "locationMain",
+                    "locationDetail",
+                    "worldSetting",
+                    "timeSlot",
+                    "weather",
+                    "skyDesc",
+                    "lighting",
+                    "fgLStructure",
+                    "fgLTexture",
+                    "fgLFurniture",
+                    "fgLProps",
+                    "mgCGround",
+                    "mgCDecoration",
+                    "mgCAtmosphere",
+                    "mgRStructure",
+                    "mgRItems",
+                    "bgBuilding",
+                    "bgTerrain",
+                    "imageUrl",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Materials"
+        ],
+        "summary": "素材を更新する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "materialId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "groupId": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "aspectRatio": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "artStyle": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "locationMain": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "locationDetail": {
+                    "type": "string"
+                  },
+                  "worldSetting": {
+                    "type": "string"
+                  },
+                  "timeSlot": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "weather": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "skyDesc": {
+                    "type": "string"
+                  },
+                  "lighting": {
+                    "type": "string"
+                  },
+                  "fgLStructure": {
+                    "type": "string"
+                  },
+                  "fgLTexture": {
+                    "type": "string"
+                  },
+                  "fgLFurniture": {
+                    "type": "string"
+                  },
+                  "fgLProps": {
+                    "type": "string"
+                  },
+                  "mgCGround": {
+                    "type": "string"
+                  },
+                  "mgCDecoration": {
+                    "type": "string"
+                  },
+                  "mgCAtmosphere": {
+                    "type": "string"
+                  },
+                  "mgRStructure": {
+                    "type": "string"
+                  },
+                  "mgRItems": {
+                    "type": "string"
+                  },
+                  "bgBuilding": {
+                    "type": "string"
+                  },
+                  "bgTerrain": {
+                    "type": "string"
+                  },
+                  "imageUrl": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新済み素材",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "groupId": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "森の背景"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "aspectRatio": {
+                      "type": "string"
+                    },
+                    "artStyle": {
+                      "type": "string"
+                    },
+                    "locationMain": {
+                      "type": "string"
+                    },
+                    "locationDetail": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "worldSetting": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "timeSlot": {
+                      "type": "string"
+                    },
+                    "weather": {
+                      "type": "string"
+                    },
+                    "skyDesc": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "lighting": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLStructure": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLTexture": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLFurniture": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "fgLProps": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgCGround": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgCDecoration": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgCAtmosphere": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgRStructure": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mgRItems": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bgBuilding": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bgTerrain": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "imageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "groupId",
+                    "name",
+                    "description",
+                    "aspectRatio",
+                    "artStyle",
+                    "locationMain",
+                    "locationDetail",
+                    "worldSetting",
+                    "timeSlot",
+                    "weather",
+                    "skyDesc",
+                    "lighting",
+                    "fgLStructure",
+                    "fgLTexture",
+                    "fgLFurniture",
+                    "fgLProps",
+                    "mgCGround",
+                    "mgCDecoration",
+                    "mgCAtmosphere",
+                    "mgRStructure",
+                    "mgRItems",
+                    "bgBuilding",
+                    "bgTerrain",
+                    "imageUrl",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Materials"
+        ],
+        "summary": "素材を削除する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "materialId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "削除完了",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/panels": {
+      "get": {
+        "tags": [
+          "Panels"
+        ],
+        "summary": "パネル一覧を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "パネル一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "panel-uuid"
+                      },
+                      "storyId": {
+                        "type": "integer"
+                      },
+                      "vertices": {
+                        "nullable": true
+                      },
+                      "prompt": {
+                        "type": "string"
+                      },
+                      "imageUrl": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "storyId",
+                      "prompt",
+                      "imageUrl",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Panels"
+        ],
+        "summary": "パネルを保存する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "vertices": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "prompt": {
+                      "type": "string",
+                      "default": ""
+                    },
+                    "imageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "vertices"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "保存済みパネル一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "panel-uuid"
+                      },
+                      "storyId": {
+                        "type": "integer"
+                      },
+                      "vertices": {
+                        "nullable": true
+                      },
+                      "prompt": {
+                        "type": "string"
+                      },
+                      "imageUrl": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "storyId",
+                      "prompt",
+                      "imageUrl",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/publish": {
+      "get": {
+        "tags": [
+          "PublishSettings"
+        ],
+        "summary": "公開設定を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "公開設定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "storyId": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "characterIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "visualStyle": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "layout": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "coverImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "displayCoverImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "storyId",
+                    "characterIds",
+                    "visualStyle",
+                    "layout",
+                    "description",
+                    "tags",
+                    "coverImageUrl",
+                    "displayCoverImageUrl",
+                    "publishedAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "PublishSettings"
+        ],
+        "summary": "公開設定を保存する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "characterIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "default": []
+                  },
+                  "visualStyle": {
+                    "type": "string"
+                  },
+                  "layout": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 20
+                    },
+                    "maxItems": 5,
+                    "default": []
+                  },
+                  "coverImageUrl": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "保存済み公開設定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "storyId": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "characterIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "visualStyle": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "layout": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "coverImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "displayCoverImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "storyId",
+                    "characterIds",
+                    "visualStyle",
+                    "layout",
+                    "description",
+                    "tags",
+                    "coverImageUrl",
+                    "displayCoverImageUrl",
+                    "publishedAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/publish/release": {
+      "post": {
+        "tags": [
+          "PublishSettings"
+        ],
+        "summary": "ストーリーを公開する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "公開済み設定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "storyId": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "characterIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "visualStyle": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "layout": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "coverImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "displayCoverImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "storyId",
+                    "characterIds",
+                    "visualStyle",
+                    "layout",
+                    "description",
+                    "tags",
+                    "coverImageUrl",
+                    "displayCoverImageUrl",
+                    "publishedAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PublishSettings"
+        ],
+        "summary": "ストーリーを非公開にする",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "非公開済み設定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "storyId": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "characterIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "visualStyle": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "layout": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "coverImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "displayCoverImageUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "storyId",
+                    "characterIds",
+                    "visualStyle",
+                    "layout",
+                    "description",
+                    "tags",
+                    "coverImageUrl",
+                    "displayCoverImageUrl",
+                    "publishedAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/publish/generate-cover-image-job": {
+      "post": {
+        "tags": [
+          "PublishSettings"
+        ],
+        "summary": "カバー画像生成ジョブを作成する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "ジョブ受付",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jobId": {
+                      "type": "string",
+                      "example": "uuid"
+                    }
+                  },
+                  "required": [
+                    "jobId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/character-relationships": {
+      "get": {
+        "tags": [
+          "CharacterRelationships"
+        ],
+        "summary": "キャラクター関係一覧を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "キャラクター関係一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "storyId": {
+                        "type": "integer"
+                      },
+                      "fromCharacterId": {
+                        "type": "integer"
+                      },
+                      "toCharacterId": {
+                        "type": "integer"
+                      },
+                      "type": {
+                        "type": "string",
+                        "example": "ライバル"
+                      },
+                      "description": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "storyId",
+                      "fromCharacterId",
+                      "toCharacterId",
+                      "type",
+                      "description",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/character-relationships/{id}": {
+      "patch": {
+        "tags": [
+          "CharacterRelationships"
+        ],
+        "summary": "キャラクター関係を更新する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新済み関係",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "storyId": {
+                      "type": "integer"
+                    },
+                    "fromCharacterId": {
+                      "type": "integer"
+                    },
+                    "toCharacterId": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "string",
+                      "example": "ライバル"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "storyId",
+                    "fromCharacterId",
+                    "toCharacterId",
+                    "type",
+                    "description",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CharacterRelationships"
+        ],
+        "summary": "キャラクター関係を削除する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "削除完了"
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}/pages": {
+      "get": {
+        "tags": [
+          "EpisodePages"
+        ],
+        "summary": "ページ一覧を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ページ一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "episodeId": {
+                        "type": "integer"
+                      },
+                      "pageNumber": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "instructions": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "imagePrompt": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "imageUrl": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "displayImageUrl": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "rows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "pageId": {
+                              "type": "integer"
+                            },
+                            "rowNumber": {
+                              "type": "integer"
+                            },
+                            "heightRatio": {
+                              "type": "string"
+                            },
+                            "layoutType": {
+                              "type": "string"
+                            },
+                            "panels": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "rowId": {
+                                    "type": "integer"
+                                  },
+                                  "panelOrder": {
+                                    "type": "integer"
+                                  },
+                                  "pagePosition": {
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "description": {
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "cameraAngle": {
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "perspectiveIntensity": {
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "depthLayers": {
+                                    "nullable": true
+                                  },
+                                  "background": {
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "characters": {
+                                    "nullable": true
+                                  },
+                                  "effects": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "lensAndLighting": {
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "frame": {
+                                    "type": "string"
+                                  },
+                                  "scale": {
+                                    "type": "number"
+                                  },
+                                  "imagePrompt": {
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "imageUrl": {
+                                    "type": "string",
+                                    "nullable": true
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "rowId",
+                                  "panelOrder",
+                                  "pagePosition",
+                                  "description",
+                                  "cameraAngle",
+                                  "perspectiveIntensity",
+                                  "background",
+                                  "effects",
+                                  "lensAndLighting",
+                                  "frame",
+                                  "scale",
+                                  "imagePrompt",
+                                  "imageUrl"
+                                ]
+                              }
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "pageId",
+                            "rowNumber",
+                            "heightRatio",
+                            "layoutType",
+                            "panels"
+                          ]
+                        }
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "episodeId",
+                      "pageNumber",
+                      "instructions",
+                      "imagePrompt",
+                      "imageUrl",
+                      "displayImageUrl",
+                      "rows",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "EpisodePages"
+        ],
+        "summary": "全ページを削除する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "削除完了",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}/pages/{pageNumber}": {
+      "put": {
+        "tags": [
+          "EpisodePages"
+        ],
+        "summary": "ページを保存する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "pageNumber",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pageNumber": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "instructions": {
+                    "type": "string"
+                  },
+                  "rows": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "rowNumber": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true
+                        },
+                        "heightRatio": {
+                          "type": "string"
+                        },
+                        "layoutType": {
+                          "type": "string"
+                        },
+                        "panels": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "panelOrder": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "exclusiveMinimum": true
+                              },
+                              "pagePosition": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "cameraAngle": {
+                                "type": "string"
+                              },
+                              "perspectiveIntensity": {
+                                "type": "string"
+                              },
+                              "depthLayers": {
+                                "type": "object",
+                                "properties": {
+                                  "foreground": {
+                                    "type": "string"
+                                  },
+                                  "midground": {
+                                    "type": "string"
+                                  },
+                                  "background": {
+                                    "type": "string"
+                                  }
+                                },
+                                "default": {}
+                              },
+                              "background": {
+                                "type": "string"
+                              },
+                              "characters": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "panel_position": {
+                                      "type": "string"
+                                    },
+                                    "shot": {
+                                      "type": "string"
+                                    },
+                                    "emotion": {
+                                      "type": "string"
+                                    },
+                                    "facing": {
+                                      "type": "string"
+                                    },
+                                    "pose": {
+                                      "type": "string"
+                                    },
+                                    "camera_proximity": {
+                                      "type": "string"
+                                    },
+                                    "lines": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "text": {
+                                            "type": "string"
+                                          },
+                                          "char_text_position": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          },
+                                          "balloon_shape": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": [
+                                          "text"
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  "required": [
+                                    "name"
+                                  ]
+                                },
+                                "default": []
+                              },
+                              "effects": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "default": []
+                              },
+                              "lensAndLighting": {
+                                "type": "string"
+                              },
+                              "frame": {
+                                "type": "string",
+                                "default": "normal"
+                              },
+                              "scale": {
+                                "type": "number",
+                                "default": 1
+                              },
+                              "imagePrompt": {
+                                "type": "string"
+                              },
+                              "imageUrl": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "panelOrder"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "rowNumber",
+                        "heightRatio",
+                        "layoutType",
+                        "panels"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "pageNumber",
+                  "rows"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "保存済みページ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}/pages/generate": {
+      "post": {
+        "tags": [
+          "EpisodePages"
+        ],
+        "summary": "パネルレイアウトを生成する（SSE）",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Server-Sent Events ストリーム",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}/pages/generate-prompt": {
+      "post": {
+        "tags": [
+          "EpisodePages"
+        ],
+        "summary": "ページプロンプトを生成する（SSE）",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Server-Sent Events ストリーム",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}/pages/jobs": {
+      "get": {
+        "tags": [
+          "EpisodePages"
+        ],
+        "summary": "エピソードのジョブ一覧を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ジョブ一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "running",
+                          "done",
+                          "failed"
+                        ]
+                      },
+                      "errorMessage": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "jobType": {
+                        "type": "string",
+                        "enum": [
+                          "image_generation",
+                          "panel_layout",
+                          "cover_image",
+                          "three_view"
+                        ]
+                      },
+                      "pageNumber": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "usedModel": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "imageModel": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "status",
+                      "errorMessage",
+                      "jobType",
+                      "pageNumber",
+                      "usedModel",
+                      "imageModel"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}/pages/generate-layout-job": {
+      "post": {
+        "tags": [
+          "EpisodePages"
+        ],
+        "summary": "パネルレイアウト生成ジョブを作成する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "ジョブ受付",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jobId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "jobId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}/pages/generate-image-job": {
+      "post": {
+        "tags": [
+          "EpisodePages"
+        ],
+        "summary": "画像生成ジョブを作成する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pageNumber": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "ジョブ受付",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jobId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "jobId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories/{storyId}/episodes/{episodeId}/pages/generate-image": {
+      "post": {
+        "tags": [
+          "EpisodePages"
+        ],
+        "summary": "画像を生成する（SSE）",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "storyId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "example": 1
+            },
+            "required": true,
+            "name": "episodeId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pageNumber": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Server-Sent Events ストリーム",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "ジョブ一覧を取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "maximum": 100,
+              "default": 50
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "RUNNING",
+                "DONE",
+                "FAILED"
+              ]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "IMAGE_GENERATION",
+                "PANEL_LAYOUT",
+                "COVER_IMAGE",
+                "THREE_VIEW"
+              ]
+            },
+            "required": false,
+            "name": "jobType",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ジョブ一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jobs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "running",
+                              "done",
+                              "failed"
+                            ]
+                          },
+                          "errorMessage": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "jobType": {
+                            "type": "string"
+                          },
+                          "pageNumber": {
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "usedModel": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "imageModel": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status",
+                          "errorMessage",
+                          "jobType",
+                          "pageNumber",
+                          "usedModel",
+                          "imageModel"
+                        ]
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "jobs",
+                    "total",
+                    "page",
+                    "limit"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{jobId}": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "ジョブを取得する",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "uuid"
+            },
+            "required": true,
+            "name": "jobId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ジョブ詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "uuid"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "running",
+                        "done",
+                        "failed"
+                      ]
+                    },
+                    "errorMessage": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status",
+                    "errorMessage"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{jobId}/events": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "ジョブのイベントをストリームする（SSE）",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "uuid"
+            },
+            "required": true,
+            "name": "jobId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Server-Sent Events ストリーム",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
